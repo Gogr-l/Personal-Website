@@ -1,0 +1,211 @@
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 8rem 2rem 4rem;
+  overflow: hidden;
+}
+
+.hero__container {
+  max-width: 1000px;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+}
+
+/* Floating shapes */
+.hero__shape {
+  position: absolute;
+  font-size: 2rem;
+  color: var(--color-accent-3);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hero__shape:nth-child(1) { color: var(--color-accent-1); font-size: 1.5rem; }
+.hero__shape:nth-child(2) { color: var(--color-accent-2); font-size: 2.5rem; }
+.hero__shape:nth-child(3) { color: var(--color-accent-4); font-size: 3rem; }
+.hero__shape:nth-child(4) { color: var(--color-accent-3); font-size: 1.75rem; }
+.hero__shape:nth-child(5) { color: var(--color-accent-1); font-size: 2rem; }
+
+/* Badge */
+.hero__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(0, 212, 170, 0.1);
+  border: 1px solid rgba(0, 212, 170, 0.3);
+  border-radius: 100px;
+  font-size: 0.85rem;
+  color: var(--color-accent-4);
+  margin-bottom: 2rem;
+}
+
+.hero__badge-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--color-accent-4);
+  border-radius: 50%;
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Greeting */
+.hero__greeting {
+  font-family: var(--font-body);
+  font-size: clamp(1.25rem, 3vw, 1.5rem);
+  font-weight: 500;
+  color: var(--color-text-muted);
+  margin-bottom: 1rem;
+}
+
+/* Title */
+.hero__title-wrapper {
+  margin-bottom: 2rem;
+}
+
+.hero__title {
+  font-size: clamp(3rem, 12vw, 8rem);
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  perspective: 1000px;
+}
+
+.hero__title-word {
+  display: block;
+}
+
+.hero__title-word:first-child .hero__title-letter {
+  background: linear-gradient(135deg, var(--color-accent-1), var(--color-accent-2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero__title-word:last-child .hero__title-letter {
+  color: var(--color-text);
+}
+
+.hero__title-letter {
+  display: inline-block;
+  transition: transform 0.3s var(--transition-bounce);
+}
+
+.hero__title-letter:hover {
+  transform: translateY(-10px) rotate(-5deg) scale(1.1);
+  color: var(--color-accent-3);
+}
+
+/* Description */
+.hero__description {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  color: var(--color-text-muted);
+  max-width: 550px;
+  margin: 0 auto 3rem;
+  line-height: 1.7;
+}
+
+/* CTA Buttons */
+.hero__cta {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.hero__button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 100px;
+  cursor: pointer;
+  transition: all 0.3s var(--transition-smooth);
+}
+
+.hero__button--primary {
+  background: linear-gradient(135deg, var(--color-accent-1), var(--color-accent-2));
+  color: var(--color-bg);
+  border: none;
+}
+
+.hero__button--primary:hover {
+  box-shadow: 0 10px 40px rgba(255, 107, 53, 0.4);
+}
+
+.hero__button-arrow {
+  transition: transform 0.3s var(--transition-bounce);
+}
+
+.hero__button--primary:hover .hero__button-arrow {
+  transform: translateX(5px);
+}
+
+.hero__button--secondary {
+  background: transparent;
+  color: var(--color-text);
+  border: 2px solid var(--color-border);
+}
+
+.hero__button--secondary:hover {
+  border-color: var(--color-accent-3);
+  color: var(--color-accent-3);
+  box-shadow: 0 10px 40px rgba(123, 97, 255, 0.2);
+}
+
+/* Scroll Indicator */
+.hero__scroll {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.hero__scroll-line {
+  width: 1px;
+  height: 40px;
+  background: linear-gradient(to bottom, var(--color-accent-3), transparent);
+  transform-origin: top;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero {
+    padding: 6rem 1.5rem 4rem;
+  }
+
+  .hero__shape {
+    display: none;
+  }
+
+  .hero__description {
+    font-size: 1rem;
+  }
+
+  .hero__cta {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .hero__button {
+    width: 100%;
+    max-width: 280px;
+    justify-content: center;
+  }
+}
+
