@@ -73,13 +73,54 @@ The result: faster access, less friction for the team. It proved value in tech i
       id: 'avarri',
       year: '2025',
       title: 'Avarri',
-      content: `Avarri fused my love for AI, design, and solving real problems. Interior designers struggle to help clients visualize changes. I wanted to change that: upload a room photo, describe the update, instantly show a transformed version.
+      content: `I started Avarri as an AI powered virtual staging tool built for real estate agents. The product lets users upload photos of any room or home and quickly generate clean staged versions that make listings look more appealing to buyers.
 
-I interviewed dozens of designers to understand their process and visualization breakdowns. Built workflows with image models, prompts, and product libraries. Wrote plans, pitched, won the Milgard School of Business VIBE Incubator prize.
+The idea originally started with interior designers. I wanted to build a tool that let designers take a photo of a real room and precisely edit it by adding, replacing, or adjusting furniture, flooring, and decor. The goal was never just to make pretty pictures. I wanted something designers could actually use in their client workflow and present real design concepts to clients.
 
-Then tech reality hit: generative AI creates stunning images but struggles with precise fidelity. That sparked the pivot: bigger opportunity in real estate virtual staging. Take empty or generic homes and personalize them for buyers—show not generic staging, but "your future home" based on their tastes, lifestyle, preferences.
+Early on I spent months talking directly to interior designers, consignment store owners, and furniture buyers. What stood out right away was how detail oriented they are. They care a lot about scale, lighting, material accuracy, and how everything fits together in a space. They did not want inspirational mood boards. They wanted control and precision. At the time the AI technology was not consistent enough for that level of detail. The outputs often broke spatial rules or looked unrealistic when making specific edits. That gap made me rethink the target market.
 
-Avarri captures my approach: start with real conversations, hit technical limits, listen to feedback and reality, then adapt quickly to where the value truly is. Iteration over assumption, every time.`,
+Real estate agents had a similar visual problem but they did not need the same level of precision. They just needed listings to look clean, staged, and appealing fast. This matched the current strengths of the technology much better. Working with a technical co founder, we shifted focus and built a simple fast web app for virtual staging. I led the business side including customer discovery, product direction, and user interviews while he handled development.
+
+We iterated quickly based on real agent feedback. One of the biggest additions was bulk staging. Agents could upload an entire set of listing photos and apply a consistent style across all of them. We also added preset styles and custom prompt options so users could choose between speed and more control. We even explored features for the buyer side, such as letting buyer agents run a quick design quiz so clients could see the home restaged in their own taste. The goal was to create a stronger emotional connection between buyers and the property.
+
+Along the way I made several important pivots. I originally considered adding a product marketplace where designers could upload items and earn commissions, but I cut that feature because it added too much complexity and pulled focus from the core value. I also narrowed the target audience down to residential real estate agents only. That clarity helped us make sharper product decisions.
+
+Unfortunately we were not able to launch. We faced two main constraints. The AI still struggled with perfect consistency across multiple images and complex edits. Also my co founder took another job which paused development.
+
+The biggest lesson from building Avarri is that the best product is not just about what the technology can do. It is about where the technology creates the most value for a specific user right now. Interior designers have the highest needs, but real estate agents were the better product market fit at this stage.
+
+This project taught me how to validate ideas through constant customer conversations. It taught me how to make tough scoping decisions and stay focused on solving one clear problem really well. I learned when to pivot and when to say no to features that sounded good but hurt the core experience. These skills and business practices are what I will carry into every future project.`,
+      variant: 'case-study',
+      media: [
+        {
+          src: 'case-studies/avarri-pitch-examples.png',
+          alt: 'Avarri pitch deck examples showing virtual staging before and after images',
+          caption: 'These are examples from the pitch deck I used in the Milgard 2025 VIBE Business Plan competition. Avarri won 1st place for best pitch.',
+          placement: 'hero',
+        },
+        {
+          src: 'case-studies/avarri-digital-warehouse-mockup.png',
+          alt: 'Initial mockup of Avarri digital warehouse for consignment stores',
+          caption: 'This was an initial mock up of our digital warehouse for consignment stores.',
+          placement: 'inline',
+          afterParagraph: 2,
+        },
+        {
+          images: [
+            {
+              src: 'case-studies/avarri-real-estate-before.png',
+              alt: 'Empty listed home before virtual staging',
+            },
+            {
+              src: 'case-studies/avarri-real-estate-after.png',
+              alt: 'Listed home after virtual staging with furniture and decor',
+            },
+          ],
+          caption: 'Demo used for our real estate agents showing before and afters of a listed home.',
+          placement: 'inline',
+          afterParagraph: 3,
+        },
+      ],
     },
     {
       id: 'windowconnect',
@@ -130,6 +171,7 @@ This was pure field-born insight. Being in the trenches reveals gaps outsiders n
       const el = t instanceof Element ? t : t.parentElement;
 
       if (el?.closest?.('.tl-header__name')) return;
+      if (el?.closest?.('.tl-case-study')) return;
 
       /* Expanded text for the open section — don’t close while reading */
       const activeBody = activeEl?.querySelector('.tl-event__content');
@@ -177,6 +219,7 @@ This was pure field-born insight. Being in the trenches reveals gaps outsiders n
   const moonEnter = Math.max(0, Math.min(1, (p - 0.65) * 3));
   const moonY = (1 - moonEnter) * -40;
   const moonX = (1 - moonEnter) * 40;
+  const activeEvent = events.find((evt) => evt.id === activeTick);
 
   return (
     <div className="tl">
@@ -247,7 +290,7 @@ This was pure field-born insight. Being in the trenches reveals gaps outsiders n
               {/* BOTTOM: expanded content below the line */}
               <div className="tl-event__bottom">
                 <AnimatePresence>
-                  {activeTick === evt.id && (
+                  {activeTick === evt.id && evt.variant !== 'case-study' && (
                     <motion.div
                       className="tl-event__content"
                       initial={{ opacity: 0, y: -10 }}
@@ -272,6 +315,68 @@ This was pure field-born insight. Being in the trenches reveals gaps outsiders n
         {/* Continuous timeline line */}
         <div className="tl-line" />
       </div>
+
+      <AnimatePresence>
+        {activeEvent?.variant === 'case-study' && (
+          <motion.section
+            className="tl-case-study"
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 12 }}
+            transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+          >
+            {activeEvent.media?.filter((item) => item.placement !== 'inline').map((item) => (
+              <figure className="tl-case-study__figure" key={item.src}>
+                <img
+                  src={`${import.meta.env.BASE_URL}${item.src}`}
+                  alt={item.alt}
+                  className="tl-case-study__image"
+                />
+                <figcaption>{item.caption}</figcaption>
+              </figure>
+            ))}
+            <div className="tl-case-study__copy">
+              {activeEvent.content.split('\n\n').map((para, i) => {
+                const inlineMedia = activeEvent.media?.filter(
+                  (item) => item.placement === 'inline' && item.afterParagraph === i,
+                );
+
+                return (
+                  <div
+                    className={`tl-case-study__entry ${inlineMedia?.length ? 'tl-case-study__entry--with-media' : ''}`}
+                    key={i}
+                  >
+                    <p>{para}</p>
+                    {inlineMedia?.map((item) => (
+                      <figure className="tl-case-study__figure tl-case-study__figure--inline" key={item.src ?? item.caption}>
+                        {item.images ? (
+                          <div className="tl-case-study__image-pair">
+                            {item.images.map((image) => (
+                              <img
+                                key={image.src}
+                                src={`${import.meta.env.BASE_URL}${image.src}`}
+                                alt={image.alt}
+                                className="tl-case-study__image"
+                              />
+                            ))}
+                          </div>
+                        ) : (
+                          <img
+                            src={`${import.meta.env.BASE_URL}${item.src}`}
+                            alt={item.alt}
+                            className="tl-case-study__image"
+                          />
+                        )}
+                        <figcaption>{item.caption}</figcaption>
+                      </figure>
+                    ))}
+                  </div>
+                );
+              })}
+            </div>
+          </motion.section>
+        )}
+      </AnimatePresence>
 
       {/* Progress */}
       <div className="tl-progress">
