@@ -4,7 +4,11 @@ import './Timeline.css';
 
 const Timeline = () => {
   const scrollRef = useRef(null);
+  const fastTrackRef = useRef(null);
   const eventRefs = useRef({});
+  const lastScrollLeftRef = useRef(0);
+  const isAutoScrollingRef = useRef(false);
+  const scrollAnimationIdRef = useRef(0);
   const [activeTick, setActiveTick] = useState('bio');
   const [scrollProgress, setScrollProgress] = useState(0);
 
@@ -13,12 +17,33 @@ const Timeline = () => {
       id: 'bio',
       year: '',
       title: 'Story',
-      content: `I'm a Puget Sound based primal systems builder focused on turning overlooked opportunities into scalable revenue engines. Growing a window cleaning and holiday lighting business gave me a clear view of inefficiencies in home services and how to convert them into automated income channels. I built Window Connect to turn window cleaners into lead generators for repair companies, and I'm developing AVARRI, an AI-powered interior design tool for professionals. My work sits at the intersection of field operations, software, and automation. I keep a straightforward, instinct-driven approach, grounded in the Pacific Northwest. I value clarity, execution, and authenticity, and I focus on building practical systems that scale while staying real in a world that overcomplicates things.`,
+      description: 'How I spot overlooked opportunities and turn them into practical systems.',
+      variant: 'story',
+      headline: 'Build The World',
+      content: 'I notice practical problems hiding inside everyday work, then turn them into systems that create leverage. Window cleaning taught me to see field opportunities most people miss; Window Connect, Akulla, ConnectXR, and Avarri are all different versions of that same pattern: spot friction, clarify the need, and build a solution that makes action easier.',
+      pillars: [
+        {
+          icon: 'opportunity',
+          title: 'Opportunity Finder',
+          text: 'I find value in overlooked details: broken window leads on job sites, scattered law-firm knowledge, awkward in-person networking, and real estate visuals that fail to move buyers.',
+        },
+        {
+          icon: 'action',
+          title: 'Action Oriented',
+          text: 'I validate through real conversations, adapt when the market or technology pushes back, and keep building toward clear, useful outcomes.',
+        },
+        {
+          icon: 'systems',
+          title: 'Systems Builder',
+          text: 'I turn those insights into repeatable frameworks, marketplaces, workflows, and product concepts designed to scale beyond one-off effort.',
+        },
+      ],
     },
     {
       id: 'was',
       year: '2018',
       title: 'Aerospace Scholars',
+      description: 'A NASA-backed aerospace program where I helped design a Mars mission concept.',
       content: `As a high school junior, I was selected for the Washington Aerospace Scholars (WAS) program through The Museum of Flight, in partnership with NASA and the University of Washington. This selective, college-level experience is tailored for Washington state students passionate about STEM, emphasizing aerospace design, space exploration, and mission planning.
 
 The program began with an intensive online curriculum from November to March, earning five UW credits. We explored air and space vehicle design, NASA's exploration strategies, and Earth/space science topics through rigorous aerospace math problems and virtual group challenges.
@@ -31,6 +56,7 @@ Our team's mission concept stood out for its innovation, feasibility, and execut
       id: 'wwl',
       year: '2020',
       title: 'Window Warriors',
+      description: 'My first operating business and the foundation for how I learned execution.',
       content: `I started a window cleaning company not because it was flashy, but because it was straightforward and honest. Show up on time, deliver solid work, communicate clearly—and you get paid. Fall short, and you don't. No hiding behind fancy strategies or excuses. The loop was immediate and unforgiving.
 
 That business became my crash course in real entrepreneurship. I learned how customers decide when it's their own money. Trust builds through reliability, not ads. Pricing has to work for everyone involved. I mastered scheduling, weekly revenue tracking, and taking payments any way they came—cash, check, app.
@@ -38,21 +64,10 @@ That business became my crash course in real entrepreneurship. I learned how cus
 Word-of-mouth turned into my best (and free) marketing channel as the client list grew. Text follow-ups to past customers filled quiet months. Adding Christmas light installations doubled winter revenue without new customer hunts. The company funded my later ventures, but more than cash, it taught me that business boils down to consistent, high-quality execution over time.`,
     },
     {
-      id: 'college',
-      year: '2022',
-      title: 'College Journey',
-      content: `I was accepted to Embry-Riddle Aeronautical University for rocket engineering. But I chose Gonzaga University instead, drawn to entrepreneurship and the chance to build ventures from the ground up.
-
-My year at Gonzaga was valuable but expensive. I realized I needed a path that allowed more creative expression in design and innovation, so I targeted the University of Washington's architecture program.
-
-I transferred to UW Tacoma and immersed myself in urban design. I deepened my GIS skills here, mapping spatial data, analyzing urban patterns, and modeling environmental systems. But I quickly encountered the limits of municipal bureaucracy.
-
-That frustration prompted another shift to general business with a minor in innovation and design at the Milgard School of Business. This combination felt right, merging strategic thinking with creative iteration. The coursework sharpened my abilities in financial analysis, operational efficiency, user-centered problem-solving, and leading technical teams.`,
-    },
-    {
       id: 'connectxr',
       year: '2024',
       title: 'ConnectXR',
+      description: 'A mixed reality experiment for making in-person networking more natural.',
       content: `Networking IRL is often awkward. ConnectXR imagined fixing that with mixed reality: AR glasses show subtle digital icons above people nearby—shared interests, work history, mutual connections—without a word.
 
 I dug into Bluetooth proximity, computer vision tracking, Apple Vision Pro limits, and iPhone camera hacks for an early prototype. The core idea was a "digital persona layer" overlaid on real space—like a dynamic, location-based Linktree visible only in AR.
@@ -63,6 +78,7 @@ It was more exploration than startup—pushing how future interfaces could make 
       id: 'akulla',
       year: '2024',
       title: 'Akulla Intelligence',
+      description: 'An AI knowledge-base project built around a real operational pain point.',
       content: `In 2024, I partnered with my college roommate Curtis (Akulla Intelligence) to build an AI tool for McKinley Irvine Law. It started with a relationship and spotting a common pain: years of documents, procedures, and knowledge scattered across folders. Staff knew the info existed but wasted time hunting it.
 
 We created a natural-language chatbot on top of their knowledge base—ask like you'd ask a colleague, get instant answers. Curtis led engineering; I identified the opportunity, built trust with the firm's leadership, clarified the problem, and connected the pieces.
@@ -73,6 +89,7 @@ The result: faster access, less friction for the team. It proved value in tech i
       id: 'avarri',
       year: '2025',
       title: 'Avarri',
+      description: 'A design-heavy AI virtual staging case study shaped by customer discovery.',
       content: `I started Avarri as an AI powered virtual staging tool built for real estate agents. The product lets users upload photos of any room or home and quickly generate clean staged versions that make listings look more appealing to buyers.
 
 The idea originally started with interior designers. I wanted to build a tool that let designers take a photo of a real room and precisely edit it by adding, replacing, or adjusting furniture, flooring, and decor. The goal was never just to make pretty pictures. I wanted something designers could actually use in their client workflow and present real design concepts to clients.
@@ -126,6 +143,7 @@ This project taught me how to validate ideas through constant customer conversat
       id: 'windowconnect',
       year: '2025',
       title: 'Window Connect',
+      description: 'A field-born lead marketplace idea connecting cleaners with repair companies.',
       content: `Window Connect came from what I saw every day on the job: broken windows, foggy panes, damaged frames—leads I could spot instantly but couldn't act on. Window cleaners are perfectly positioned to find repair work early, yet no system connects us to repair companies.
 
 I sketched a platform where cleaners submit warm leads, it routes them smartly to shops, and both sides earn. I focused on seamless integration with repair workflows—subscription plus per-lead fees.
@@ -136,6 +154,7 @@ This was pure field-born insight. Being in the trenches reveals gaps outsiders n
       id: 'vision',
       year: '',
       title: 'Vision',
+      description: 'The direction I want to build toward next.',
       content: 'Where I see myself going and the impact I want to create. The future is built by those who imagine it first. Every pivot, every venture, every failure has been a lesson building toward something bigger.',
     },
   ], []);
@@ -145,7 +164,67 @@ This was pure field-born insight. Being in the trenches reveals gaps outsiders n
     if (!el) return;
     const maxScroll = el.scrollWidth - el.clientWidth;
     setScrollProgress(maxScroll > 0 ? el.scrollLeft / maxScroll : 0);
+    lastScrollLeftRef.current = el.scrollLeft;
 
+    if (isAutoScrollingRef.current) return;
+
+    const scrollRect = el.getBoundingClientRect();
+    const viewportCenter = scrollRect.left + scrollRect.width / 2;
+    const centeredEvent = events.reduce((closest, evt) => {
+      const eventEl = eventRefs.current[evt.id];
+      if (!eventEl) return closest;
+
+      const eventRect = eventEl.getBoundingClientRect();
+      const eventCenter = eventRect.left + eventRect.width / 2;
+      const distance = Math.abs(eventCenter - viewportCenter);
+
+      if (!closest || distance < closest.distance) {
+        return { id: evt.id, distance, width: eventRect.width, variant: evt.variant };
+      }
+
+      return closest;
+    }, null);
+
+    if (!centeredEvent) return;
+
+    const activationRange = centeredEvent.variant === 'case-study'
+      ? Math.min(centeredEvent.width * 0.08, 80)
+      : centeredEvent.width / 2;
+    setActiveTick((current) => (
+      centeredEvent.distance <= activationRange && current !== centeredEvent.id
+        ? centeredEvent.id
+        : current
+    ));
+  }, [events]);
+
+  const handleWheel = useCallback((e) => {
+    const scrollEl = scrollRef.current;
+    if (!scrollEl) return;
+
+    const target = e.target instanceof Element ? e.target : null;
+    if (target?.closest('.tl-case-study')) return;
+    if (target?.closest('.tl-event__bottom')) return;
+
+    const maxScroll = scrollEl.scrollWidth - scrollEl.clientWidth;
+    if (maxScroll <= 0) return;
+
+    const modeMultiplier = e.deltaMode === 1
+      ? 16
+      : e.deltaMode === 2
+        ? window.innerHeight
+        : 1;
+    const dominantDelta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+    const nextScrollLeft = Math.max(
+      0,
+      Math.min(maxScroll, scrollEl.scrollLeft + dominantDelta * modeMultiplier),
+    );
+
+    if (nextScrollLeft === scrollEl.scrollLeft) return;
+
+    e.preventDefault();
+    isAutoScrollingRef.current = false;
+    scrollAnimationIdRef.current += 1;
+    scrollEl.scrollLeft = nextScrollLeft;
   }, []);
 
   useEffect(() => {
@@ -154,6 +233,65 @@ This was pure field-born insight. Being in the trenches reveals gaps outsiders n
     el.addEventListener('scroll', handleScroll, { passive: true });
     return () => el.removeEventListener('scroll', handleScroll);
   }, [handleScroll]);
+
+  const scrollEventToCenter = useCallback((id, onComplete) => {
+    const el = eventRefs.current[id];
+    const scrollEl = scrollRef.current;
+    if (!el || !scrollEl) {
+      onComplete?.();
+      return;
+    }
+
+    const sr = scrollEl.getBoundingClientRect();
+    const er = el.getBoundingClientRect();
+    const start = scrollEl.scrollLeft;
+    const target = start + er.left + er.width / 2 - (sr.left + sr.width / 2);
+    const duration = 540;
+    const startTime = performance.now();
+    const animationId = scrollAnimationIdRef.current + 1;
+    scrollAnimationIdRef.current = animationId;
+    isAutoScrollingRef.current = true;
+
+    const animate = (now) => {
+      if (scrollAnimationIdRef.current !== animationId) return;
+
+      const progress = Math.min((now - startTime) / duration, 1);
+      const eased = progress < 0.5
+        ? 4 * progress * progress * progress
+        : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+      scrollEl.scrollLeft = start + (target - start) * eased;
+      if (progress < 1) {
+        window.requestAnimationFrame(animate);
+      } else {
+        window.setTimeout(() => {
+          if (scrollAnimationIdRef.current !== animationId) return;
+
+          isAutoScrollingRef.current = false;
+          lastScrollLeftRef.current = scrollEl.scrollLeft;
+          onComplete?.();
+        }, 80);
+      }
+    };
+
+    window.requestAnimationFrame(animate);
+  }, []);
+
+  const openEvent = useCallback((id) => {
+    if (activeTick === id) {
+      setActiveTick(null);
+      return;
+    }
+
+    const targetEvent = events.find((evt) => evt.id === id);
+    if (targetEvent?.variant === 'case-study') {
+      setActiveTick(null);
+      window.requestAnimationFrame(() => scrollEventToCenter(id, () => setActiveTick(id)));
+      return;
+    }
+
+    setActiveTick(id);
+    window.requestAnimationFrame(() => scrollEventToCenter(id));
+  }, [activeTick, events, scrollEventToCenter]);
 
   useEffect(() => {
     const onKey = (e) => { if (e.key === 'Escape') setActiveTick(null); };
@@ -170,7 +308,8 @@ This was pure field-born insight. Being in the trenches reveals gaps outsiders n
       if (!(t instanceof Node)) return;
       const el = t instanceof Element ? t : t.parentElement;
 
-      if (el?.closest?.('.tl-header__name')) return;
+      if (el?.closest?.('.tl-header')) return;
+      if (el?.closest?.('.tl-fast-track')) return;
       if (el?.closest?.('.tl-case-study')) return;
 
       /* Expanded text for the open section — don’t close while reading */
@@ -184,26 +323,6 @@ This was pure field-born insight. Being in the trenches reveals gaps outsiders n
     };
     document.addEventListener('click', onDocClick);
     return () => document.removeEventListener('click', onDocClick);
-  }, [activeTick]);
-
-  /* Center the active event horizontally when opening or switching sections */
-  useEffect(() => {
-    if (!activeTick) return;
-    const el = eventRefs.current[activeTick];
-    const scrollEl = scrollRef.current;
-    if (!el || !scrollEl) return;
-
-    const center = () => {
-      const sr = scrollEl.getBoundingClientRect();
-      const er = el.getBoundingClientRect();
-      const delta = er.left + er.width / 2 - (sr.left + sr.width / 2);
-      scrollEl.scrollBy({ left: delta, behavior: 'smooth' });
-    };
-
-    const id = window.requestAnimationFrame(() => {
-      window.requestAnimationFrame(center);
-    });
-    return () => window.cancelAnimationFrame(id);
   }, [activeTick]);
 
   // Background opacity — 6 stages: ground → trees → sky → atmosphere → space → moon
@@ -222,7 +341,7 @@ This was pure field-born insight. Being in the trenches reveals gaps outsiders n
   const activeEvent = events.find((evt) => evt.id === activeTick);
 
   return (
-    <div className="tl">
+    <div className="tl" onWheel={handleWheel}>
       {/* Backgrounds */}
       <div className="tl-bg">
         <div className="tl-bg__layer tl-bg__ground"      style={{ opacity: ground }} />
@@ -249,10 +368,35 @@ This was pure field-born insight. Being in the trenches reveals gaps outsiders n
         <div className="tl-moon__gloss" />
       </div>
 
-      {/* Name — fixed top-left */}
+      {/* Header */}
       <header className="tl-header">
         <span className="tl-header__name">Dominic Martinez</span>
+        <button
+          className="tl-header__case-studies"
+          type="button"
+          onClick={() => openEvent('avarri')}
+        >
+          Case Studies
+        </button>
       </header>
+
+      <nav className="tl-fast-track" ref={fastTrackRef} aria-label="Fast track timeline navigation">
+        <span className="tl-fast-track__label">Fast Track</span>
+        <div className="tl-fast-track__items">
+          {events.map((evt) => (
+            <button
+              key={evt.id}
+              className={`tl-fast-track__item ${activeTick === evt.id ? 'active' : ''}`}
+              type="button"
+              onClick={() => openEvent(evt.id)}
+              aria-label={`Go to ${evt.title}`}
+            >
+              <span className="tl-fast-track__title">{evt.title}</span>
+              <span className="tl-fast-track__description">{evt.description}</span>
+            </button>
+          ))}
+        </div>
+      </nav>
 
       {/* Scrollable area */}
       <div className="tl-scroll" ref={scrollRef}>
@@ -272,7 +416,7 @@ This was pure field-born insight. Being in the trenches reveals gaps outsiders n
               <div className="tl-event__top">
                 <button
                   className={`tl-event__title ${activeTick === evt.id ? 'active' : ''}`}
-                  onClick={() => setActiveTick(activeTick === evt.id ? null : evt.id)}
+                  onClick={() => openEvent(evt.id)}
                 >
                   {evt.title}
                 </button>
@@ -292,15 +436,41 @@ This was pure field-born insight. Being in the trenches reveals gaps outsiders n
                 <AnimatePresence>
                   {activeTick === evt.id && evt.variant !== 'case-study' && (
                     <motion.div
-                      className="tl-event__content"
+                      className={`tl-event__content ${evt.variant === 'story' ? 'tl-event__content--story' : ''}`}
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
                       transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
                     >
-                      {evt.content.split('\n\n').map((para, i) => (
-                        <p key={i}>{para}</p>
-                      ))}
+                      {evt.variant === 'story' ? (
+                        <section className="tl-story" aria-label="Story summary">
+                          <h2 className="tl-story__headline">{evt.headline}</h2>
+                          <p className="tl-story__intro">{evt.content}</p>
+                          <div className="tl-story__pillars">
+                            {evt.pillars.map((pillar) => (
+                              <article className="tl-story__pillar" key={pillar.title}>
+                                <span className={`tl-story__icon tl-story__icon--${pillar.icon}`} aria-hidden="true">
+                                  {pillar.icon === 'action' && (
+                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                      <path d="m11 17 2 2a1 1 0 1 0 3-3" />
+                                      <path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4" />
+                                      <path d="m21 3 1 11h-2" />
+                                      <path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3" />
+                                      <path d="M3 4h8" />
+                                    </svg>
+                                  )}
+                                </span>
+                                <h3>{pillar.title}</h3>
+                                <p>{pillar.text}</p>
+                              </article>
+                            ))}
+                          </div>
+                        </section>
+                      ) : (
+                        evt.content.split('\n\n').map((para, i) => (
+                          <p key={i}>{para}</p>
+                        ))
+                      )}
                     </motion.div>
                   )}
                 </AnimatePresence>

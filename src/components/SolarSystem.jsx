@@ -107,22 +107,6 @@ The real highlight was the optional summer residency at The Museum of Flight: a 
 Our team's mission concept stood out for its innovation, feasibility, and execution, earning us the Best Aerospace Startup award. This experience fueled my early interest in rocket engineering while teaching me how to lead under pressure, collaborate across disciplines, and turn technical constraints into effective solutions. Those skills translate directly to entrepreneurship.`,
           image: null,
         },
-        {
-          title: 'College Journey: From Engineering to Business and Design',
-          year: '2022–2026',
-          content: `Building on that momentum, I was accepted to Embry-Riddle Aeronautical University for rocket engineering, which aligned perfectly with my propulsion focus from WAS. But I chose Gonzaga University instead, drawn to entrepreneurship and the chance to build ventures from the ground up.
-
-My year at Gonzaga was valuable but expensive: I completed core classes in humanities and sciences that did not connect closely to my goals. I realized I needed a path that allowed more creative expression in design and innovation, so I targeted the University of Washington's architecture program to explore spatial problem-solving.
-
-I transferred to UW Tacoma (UWT) and immersed myself in urban design. Courses covered city planning, sustainable development, and community impact. I deepened my GIS skills here, mapping spatial data, analyzing urban patterns, and modeling environmental systems, which gave me tools for visualizing complex real-world scenarios. But I quickly encountered the limits of municipal bureaucracy: heavy regulations often stifled creative, forward-thinking solutions and slowed progress.
-
-That frustration prompted another shift to general business with a minor in innovation and design at the Milgard School of Business. This combination felt right, merging strategic thinking with creative iteration. The coursework sharpened my abilities in financial analysis, operational efficiency, user-centered problem-solving, design processes, data-driven forecasting, and leading technical teams. As I worked on several different business ideas in parallel with my education I found niche areas where I could directly apply my academic learnings to my entrepreneurial endeavors.
-
-Early on, I had won the Webber Excellence in Writing Award at Bellarmine Prep for strong analytical essays and research papers, which honed my communication skills. Those carried forward here, helping me craft clear pitches, business plans, and collaborative documents, essential for turning ideas into reality.
-
-This non-linear path equipped me with a versatile set of proficiencies: spotting opportunities, prototyping under constraints, analyzing data and systems, leading teams, and iterating toward impact. It directly supported successes like winning the VIBE Incubator pitch prize for Avarri.`,
-          image: null,
-        },
       ],
     },
     {
