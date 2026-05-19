@@ -1,10 +1,185 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import './Timeline.css';
 
+const CaseStudyImage = ({ src, alt, className, onExpand }) => (
+  <button
+    type="button"
+    className="tl-case-study__image-btn"
+    onClick={onExpand}
+    aria-label={`View larger: ${alt}`}
+  >
+    <img src={src} alt={alt} className={className} />
+  </button>
+);
+
+const ImageLightbox = ({ image, onClose }) => {
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key !== 'Escape') return;
+      e.stopImmediatePropagation();
+      onClose();
+    };
+    window.addEventListener('keydown', onKey, true);
+    return () => window.removeEventListener('keydown', onKey, true);
+  }, [onClose]);
+
+  return createPortal(
+    <motion.div
+      className="tl-image-lightbox"
+      role="dialog"
+      aria-modal="true"
+      aria-label={image.alt}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+      onClick={(e) => {
+        e.stopPropagation();
+        onClose();
+      }}
+    >
+      <button
+        type="button"
+        className="tl-image-lightbox__close"
+        onClick={(e) => {
+          e.stopPropagation();
+          onClose();
+        }}
+        aria-label="Close"
+      >
+        ×
+      </button>
+      <motion.img
+        className="tl-image-lightbox__img"
+        src={image.src}
+        alt={image.alt}
+        initial={{ opacity: 0, scale: 0.96 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.96 }}
+        transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+        onClick={(e) => e.stopPropagation()}
+      />
+      {image.caption ? <p className="tl-image-lightbox__caption">{image.caption}</p> : null}
+    </motion.div>,
+    document.body,
+  );
+};
+
+const CaseStudyContent = ({ event }) => {
+  const baseUrl = import.meta.env.BASE_URL;
+  const heroMedia = event.media?.filter((item) => item.placement === 'hero') ?? [];
+  const [expandedImage, setExpandedImage] = useState(null);
+
+  const expandImage = useCallback((image) => {
+    setExpandedImage(image);
+  }, []);
+
+  const closeImage = useCallback(() => {
+    setExpandedImage(null);
+  }, []);
+
+  const renderImage = (src, alt, className, caption) => (
+    <CaseStudyImage
+      src={`${baseUrl}${src}`}
+      alt={alt}
+      className={className}
+      onExpand={() => expandImage({ src: `${baseUrl}${src}`, alt, caption })}
+    />
+  );
+
+  return (
+    <div className="tl-case-study__layout">
+      <AnimatePresence>
+        {expandedImage && (
+          <ImageLightbox key={expandedImage.src} image={expandedImage} onClose={closeImage} />
+        )}
+      </AnimatePresence>
+
+      {heroMedia.length > 0 && (
+        <div className="tl-case-study__hero">
+          {heroMedia.map((item) => (
+            <figure className="tl-case-study__figure tl-case-study__figure--hero" key={item.src}>
+              {renderImage(item.src, item.alt, 'tl-case-study__image', item.caption)}
+              {item.caption ? <figcaption>{item.caption}</figcaption> : null}
+            </figure>
+          ))}
+        </div>
+      )}
+
+      <div className="tl-case-study__copy">
+        {event.content.split('\n\n').map((para, i) => {
+          const inlineMedia = event.media?.filter(
+            (item) => item.placement === 'inline' && item.afterParagraph === i,
+          );
+          const isHeading = para.length < 120 && !/[.!?]$/.test(para.trim());
+          const isPersonaStack = inlineMedia?.some((item) => item.layout === 'persona');
+          const isStack = inlineMedia?.some((item) => item.layout === 'stack');
+
+          const figureNodes = inlineMedia?.map((item) => (
+            <figure
+              className={[
+                'tl-case-study__figure',
+                'tl-case-study__figure--inline',
+                item.layout === 'persona' ? 'tl-case-study__figure--persona' : '',
+                item.wide ? 'tl-case-study__figure--wide' : '',
+              ].filter(Boolean).join(' ')}
+              key={item.src ?? item.caption}
+            >
+              {item.images ? (
+                <div className="tl-case-study__image-pair">
+                  {item.images.map((image) => (
+                    <CaseStudyImage
+                      key={image.src}
+                      src={`${baseUrl}${image.src}`}
+                      alt={image.alt}
+                      className="tl-case-study__image"
+                      onExpand={() => expandImage({
+                        src: `${baseUrl}${image.src}`,
+                        alt: image.alt,
+                        caption: item.caption,
+                      })}
+                    />
+                  ))}
+                </div>
+              ) : (
+                renderImage(item.src, item.alt, 'tl-case-study__image', item.caption)
+              )}
+              <figcaption>{item.caption}</figcaption>
+            </figure>
+          ));
+
+          return (
+            <div
+              className={[
+                'tl-case-study__entry',
+                isHeading ? 'tl-case-study__entry--heading' : '',
+                isPersonaStack ? 'tl-case-study__entry--persona' : '',
+                isStack ? 'tl-case-study__entry--stack' : '',
+              ].filter(Boolean).join(' ')}
+              key={i}
+            >
+              {isHeading ? (
+                <h3 className="tl-case-study__heading">{para}</h3>
+              ) : (
+                <p>{para}</p>
+              )}
+              {isPersonaStack ? (
+                <div className="tl-case-study__persona-stack">{figureNodes}</div>
+              ) : (
+                figureNodes
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
 const Timeline = () => {
   const scrollRef = useRef(null);
-  const fastTrackRef = useRef(null);
   const eventRefs = useRef({});
   const lastScrollLeftRef = useRef(0);
   const isAutoScrollingRef = useRef(false);
@@ -38,19 +213,6 @@ const Timeline = () => {
           text: 'I turn those insights into repeatable frameworks, marketplaces, workflows, and product concepts designed to scale beyond one-off effort.',
         },
       ],
-    },
-    {
-      id: 'was',
-      year: '2018',
-      title: 'Aerospace Scholars',
-      description: 'A NASA-backed aerospace program where I helped design a Mars mission concept.',
-      content: `As a high school junior, I was selected for the Washington Aerospace Scholars (WAS) program through The Museum of Flight, in partnership with NASA and the University of Washington. This selective, college-level experience is tailored for Washington state students passionate about STEM, emphasizing aerospace design, space exploration, and mission planning.
-
-The program began with an intensive online curriculum from November to March, earning five UW credits. We explored air and space vehicle design, NASA's exploration strategies, and Earth/space science topics through rigorous aerospace math problems and virtual group challenges.
-
-The real highlight was the optional summer residency at The Museum of Flight: a week of hands-on collaboration with NASA scientists, engineers, university students, and STEM professionals. Teams planned realistic human missions to Mars, covering trajectories, propulsion systems, resource allocation, and vehicle architecture. I served as propulsion team leader for our group, leading the design and optimization of the propulsion subsystem to ensure efficient thrust, fuel management, and reliable performance for the interplanetary journey.
-
-Our team's mission concept stood out for its innovation, feasibility, and execution, earning us the Best Aerospace Startup award.`,
     },
     {
       id: 'wwl',
@@ -143,19 +305,114 @@ This project taught me how to validate ideas through constant customer conversat
       id: 'windowconnect',
       year: '2025',
       title: 'Window Connect',
-      description: 'A field-born lead marketplace idea connecting cleaners with repair companies.',
-      content: `Window Connect came from what I saw every day on the job: broken windows, foggy panes, damaged frames—leads I could spot instantly but couldn't act on. Window cleaners are perfectly positioned to find repair work early, yet no system connects us to repair companies.
+      description: 'A two-sided referral marketplace connecting window cleaners with repair companies.',
+      variant: 'case-study',
+      content: `I built Window Connect to solve a simple but expensive gap in the home services market: window cleaners regularly notice damaged windows, rotting frames, fogged seals, and cracked glass, but there is no easy way for them to turn those observations into qualified repair referrals. At the same time, window repair companies need warm, local leads that are more trustworthy than generic ad leads. Window Connect connects those two groups through a referral workflow where cleaners submit damage leads, repair companies receive matched opportunities, and payments are tracked through the platform.
 
-I sketched a platform where cleaners submit warm leads, it routes them smartly to shops, and both sides earn. I focused on seamless integration with repair workflows—subscription plus per-lead fees.
+User Research Section: Insights from Eugene (Window Repair Company Owner)
 
-This was pure field-born insight. Being in the trenches reveals gaps outsiders never notice.`,
-    },
-    {
-      id: 'vision',
-      year: '',
-      title: 'Vision',
-      description: 'The direction I want to build toward next.',
-      content: 'Where I see myself going and the impact I want to create. The future is built by those who imagine it first. Every pivot, every venture, every failure has been a lesson building toward something bigger.',
+As part of our early validation process for Window Connect, I conducted a detailed 90-minute discovery call with Eugene, owner of a well-established residential window repair and replacement company in the South Sound area. Eugene represents our core demand-side user: a hands-on operator who balances high-volume service with a strong reputation for honesty and quality. I walked him through the current prototype, explained the $60 lead model ($45 to the cleaner), the preferred partner routing, and the mobile submission flow for cleaners.
+
+Key Feedback & Pain Points Identified
+
+Eugene showed genuine interest in the platform but pushed back on several aspects of the initial model. Lead Quality Over Volume: He views single-pane or minor glass-only repairs as low-value and often not worth pursuing aggressively. He's willing to pay significantly more — $150–$200 — for qualified full-house replacement leads (older windows, multiple panes, clear customer interest). Minor leads feel like a step backward compared to his current inbound word-of-mouth business. Incentive Misalignment: While he understands the need to pay cleaners, he emphasized that cleaners must be trained and incentivized to spot high-potential opportunities (e.g., single-pane windows, hard-to-operate windows, wood rot, windows 20+ years old). He offered practical qualifying questions cleaners could ask homeowners during intake: "How old are your windows?" and "Do they open and close easily?" Mutual Value & Reciprocity: Eugene proposed creative win-win structures beyond simple lead fees: free or discounted window cleaning promos bundled with full replacements to fill cleaners' slower winter schedules; reciprocal lead flow (window jobs back to cleaners for every replacement closed); and preferred partner relationships where reliable cleaners get consistent work and priority routing. Feature Gaps Highlighted: strong need for lead filters on the company dashboard (minimum number of windows, window age, residential only, damage type); better photo and measurement guidance for cleaners to reduce wasted trips; visibility into cleaner performance and lead quality ratings; and ability for companies to build direct, trusted relationships with top cleaners.
+
+What Worked Well
+
+Eugene liked the warm referral angle — a cleaner who is already trusted in the home has a huge credibility advantage. He also appreciated the preferred partner model (cleaners choosing their company) because it rewards good behavior and builds real relationships rather than a random rotation system like Angie's List. He explicitly said the concept has legs and could evolve into something bigger than generic lead gen platforms, especially if we focus on honest, high-quality matches in the window niche.
+
+Actionable Learnings & Product Implications
+
+This conversation was extremely valuable and directly shaped our roadmap: shift toward qualified leads with educational resources, checklists, photo guidelines, and age/intent qualifiers; move beyond flat $60 leads toward tiered or subscription plus performance bonuses for premium leads; build network effect tools like tipping, preferred partner favoritism, and reciprocal job flow; add cleaner enablement with training materials, scripts, and post-job inspection reports; and treat Eugene's openness to testing once filters are added as a validation signal for product-market fit with the right companies.
+
+Bottom line: Eugene reinforced that Window Connect's biggest differentiator is the distributed field intelligence from cleaners who are already inside homes. Success won't come from volume alone but from quality, trust, and mutual business growth between cleaners and repair companies.
+
+At the center of the system is a role-based experience for three types of users: cleaners, repair companies, and admins. Cleaners can submit leads and track referrals, companies can manage their lead inbox and update lead outcomes, and admins can oversee disputes, payment holds, payouts, and unassigned leads. The system uses authentication and role protection so each user lands in the right dashboard and only sees the workflow meant for their role.
+
+The most important system is the lead routing engine. When a cleaner enters a ZIP code or uses device location, Window Connect checks which repair companies serve that area. It considers whether the company is accepting leads, whether it is within its monthly lead or cash budget, whether it has a Google rating, and when it last received a lead. The result is a round-robin style assignment with a slight rating bias, so distribution is fair while still rewarding stronger companies. Cleaners can also have a preferred repair company, and the system checks whether that preferred company serves the ZIP and is currently available.
+
+Systems Specifications
+
+The cleaner submit lead page is designed to be fast in the field. I structured it so the cleaner starts with location, because ZIP code determines whether the lead can be matched immediately. They can use their device location or manually enter a ZIP code, and once the location is confirmed, the page shows the matched repair company inline. From there, the cleaner uploads photos, selects the issue type, enters the number of damaged windows, adds optional notes, and provides the customer's name and phone number. Before submitting, the cleaner must confirm the homeowner gave permission to share their contact information with a repair company.
+
+The submit page also handles edge cases directly in the interface. If the preferred company is paused, outside the ZIP, or unavailable, the cleaner sees a clear warning and can switch to auto-match. If there are no companies in the ZIP yet, the cleaner can still submit the lead for review, and the system saves it as unassigned so an admin can match it later. After submission, the cleaner sees a success state that confirms whether the lead went to a company and reminds them they can earn $45 once the lead is approved.
+
+For repair companies, the lead inbox is the main working surface. I designed it as a compact list of assigned opportunities with high-signal information: customer name, issue type, status, submission time, address, phone or email, and number of damaged windows. At the top, companies see summary stats like total leads, leads received this week, and leads left based on their budget settings. This gives the company a quick sense of pipeline volume before they even open an individual lead.
+
+Each lead card links to a dedicated lead detail page. When a company clicks a lead, the system loads the full lead record, related cleaner information, uploaded photos, status history, and any existing tip or report state. Opening the lead also marks it as viewed by the company, which lets the inbox distinguish fresh leads from ones the company has already reviewed. This creates a simple operational rhythm: new leads arrive in the inbox, the company opens the details, contacts the customer, and updates the lead as it moves through the sales process.
+
+The company lead detail page is built around actionability. At the top, the company sees quick status actions like Contacted, Scheduled, Won, Lost, or Invalid. Below that, the main card shows the photos first, because visual proof is one of the biggest advantages of cleaner-sourced referrals. The page then shows customer contact buttons, address, issue type, damaged window count, submission time, preferred contact time, cleaner notes, and a "referred by" section. There is also a warm outreach tip that reminds the repair company to mention the cleaner by name, which helps turn a cold call into a trusted introduction.
+
+I also built a reporting and dispute path into the lead detail page. If a repair company believes a lead is invalid, duplicated, unreachable, or otherwise problematic, they can report the issue. That creates a lead report for admin review and flags the related payment hold as disputed and extended, which prevents automatic capture while the issue is investigated. This protects repair companies from bad leads while still keeping the referral workflow accountable.
+
+I designed the repair company analytics page to give companies a clear view of whether Window Connect is actually producing value for them. Instead of only showing a list of leads, the page turns their activity into business metrics: total leads, new leads, won leads, conversion rate, estimated repair value, and billing-related totals. I wanted repair companies to quickly understand how many opportunities they received, how many turned into jobs, and where each lead stands in the funnel. The page also helps companies connect their lead spend to potential revenue, which makes the platform feel less like an inbox and more like a performance dashboard for their referral channel.
+
+The billing system is designed around trust between both sides. When a lead is assigned to a company, the system creates a $60 payment hold using Stripe manual capture. The hold gives the repair company time to review and work the lead, while preserving the cleaner's expected $45 payout if the lead is approved. If there is no dispute, the hold can be captured and the cleaner payout record is created. If there is a dispute, the admin can review before money moves.
+
+The platform also supports tips from repair companies to cleaners. On older leads, the company may see a prompt asking whether the lead converted and offering a way to tip the referring cleaner. Tips are charged to the company's saved card and transferred through Stripe Connect. This gives companies a direct way to reward high-quality referral partners, and it reinforces the network effect: cleaners who are rewarded are more likely to keep choosing that company.
+
+The cleaner "Payouts" page is where field techs see whether referral work is actually turning into money. Window Connect pays $45 per approved lead after a 14-day verification period; that rule is front and center so cleaners know what "pending" means versus money they can touch.
+
+If someone has not finished bank setup, the page walks them through Stripe Connect onboarding: a clear "set up / continue" path, plus a "still needed" checklist when Stripe is blocking payouts (ID, bank account, TOS, etc.). This matters because cleaners will abandon the product if payouts feel vague; here the blocker is named instead of hidden behind a generic error.
+
+Once connected, the page splits money into available versus pending balance. Available is what they can withdraw; pending holds earnings still in verification or in flight at Stripe. A short help popover explains that split so people do not assume the app "lost" their cash. There is a withdraw-to-bank action for available funds (with a minimum so tiny transfers do not break), and a Stripe dashboard link for power users who want the full account view. "Withdrawal history" lists past transfers with status pills (pending, processing, completed, failed) so there is an audit trail for reference with support.
+
+Below that, "lead payouts" ties dollars back to real work: each row shows the customer/location context, when the payout was created, amount, and status (e.g. pending vs paid vs rejected).
+
+Finally, a compact "how payouts work" section restates the business rules (including automatic deposits every two weeks vs manual withdraw), and "report issue" is visible at the bottom so friction in payouts can become a support ticket.
+
+Overall, Window Connect turns an informal referral behavior into a structured marketplace. Cleaners get a simple mobile-friendly way to monetize observations they already make on the job. Repair companies get warm, local, photo-backed leads with customer contact information and context. Admins get the oversight needed to manage disputes, billing, payouts, and unassigned leads. The result is a system where every lead has a clear path from field observation to company follow-up to payment.`,
+      media: [
+        {
+          src: 'case-studies/window-connect-persona-supply.png',
+          alt: 'Target customer persona for Tyler Brooks, independent window cleaner on the supply side',
+          caption: 'Supply-side persona: Tyler Brooks — independent window cleaner who spots damage in the field.',
+          placement: 'inline',
+          afterParagraph: 0,
+          layout: 'persona',
+        },
+        {
+          src: 'case-studies/window-connect-persona-demand.png',
+          alt: 'Target customer persona for Eugene, window repair company owner on the demand side',
+          caption: 'Demand-side persona: Eugene — residential window repair and replacement operator in the South Sound.',
+          placement: 'inline',
+          afterParagraph: 0,
+          layout: 'persona',
+        },
+        {
+          src: 'case-studies/window-connect-new-lead.png',
+          alt: 'Window Connect mobile New Lead form with location, photos, issue details, customer contact, and submit lead',
+          caption: 'Cleaner submit flow: ZIP or location, photo upload, issue type, customer details, and homeowner consent.',
+          placement: 'inline',
+          layout: 'stack',
+          afterParagraph: 13,
+        },
+        {
+          src: 'case-studies/window-connect-lead-detail.png',
+          alt: 'Window Connect lead detail for Marriott Tacoma Downtown showing status actions, cracked glass photos, outreach tip, and referral from Brennan Hamlin',
+          caption: 'Company lead detail: status workflow, photos, job context, warm-outreach tip, cleaner notes, and referral source.',
+          placement: 'inline',
+          layout: 'stack',
+          afterParagraph: 17,
+        },
+        {
+          src: 'case-studies/window-connect-analytics.png',
+          alt: 'Window Connect analytics dashboard with lead KPIs, damage mix, ZIP performance, and lead spend summary',
+          caption: 'Company analytics: lead volume, status mix, damage types, ZIP and issue performance, plus lead spend and cost per won lead.',
+          placement: 'inline',
+          layout: 'stack',
+          wide: true,
+          afterParagraph: 19,
+        },
+        {
+          src: 'case-studies/window-connect-payouts.png',
+          alt: 'Window Connect mobile payouts screen with available balance, withdrawal history, and per-lead payout status',
+          caption: 'Cleaner payouts: available and pending balance, withdraw to bank, withdrawal history, and lead payout rows.',
+          placement: 'inline',
+          layout: 'stack',
+          afterParagraph: 23,
+        },
+      ],
     },
   ], []);
 
@@ -187,9 +444,7 @@ This was pure field-born insight. Being in the trenches reveals gaps outsiders n
 
     if (!centeredEvent) return;
 
-    const activationRange = centeredEvent.variant === 'case-study'
-      ? Math.min(centeredEvent.width * 0.08, 80)
-      : centeredEvent.width / 2;
+    const activationRange = centeredEvent.width / 2;
     setActiveTick((current) => (
       centeredEvent.distance <= activationRange && current !== centeredEvent.id
         ? centeredEvent.id
@@ -202,7 +457,6 @@ This was pure field-born insight. Being in the trenches reveals gaps outsiders n
     if (!scrollEl) return;
 
     const target = e.target instanceof Element ? e.target : null;
-    if (target?.closest('.tl-case-study')) return;
     if (target?.closest('.tl-event__bottom')) return;
 
     const maxScroll = scrollEl.scrollWidth - scrollEl.clientWidth;
@@ -282,19 +536,16 @@ This was pure field-born insight. Being in the trenches reveals gaps outsiders n
       return;
     }
 
-    const targetEvent = events.find((evt) => evt.id === id);
-    if (targetEvent?.variant === 'case-study') {
-      setActiveTick(null);
-      window.requestAnimationFrame(() => scrollEventToCenter(id, () => setActiveTick(id)));
-      return;
-    }
-
     setActiveTick(id);
     window.requestAnimationFrame(() => scrollEventToCenter(id));
   }, [activeTick, events, scrollEventToCenter]);
 
   useEffect(() => {
-    const onKey = (e) => { if (e.key === 'Escape') setActiveTick(null); };
+    const onKey = (e) => {
+      if (e.key !== 'Escape') return;
+      if (document.querySelector('.tl-image-lightbox')) return;
+      setActiveTick(null);
+    };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, []);
@@ -310,8 +561,7 @@ This was pure field-born insight. Being in the trenches reveals gaps outsiders n
 
       if (el?.closest?.('.tl-header')) return;
       if (el?.closest?.('.tl-fast-track')) return;
-      if (el?.closest?.('.tl-case-study')) return;
-
+      if (el?.closest?.('.tl-image-lightbox')) return;
       /* Expanded text for the open section — don’t close while reading */
       const activeBody = activeEl?.querySelector('.tl-event__content');
       if (activeBody?.contains(t)) return;
@@ -338,8 +588,6 @@ This was pure field-born insight. Being in the trenches reveals gaps outsiders n
   const moonEnter = Math.max(0, Math.min(1, (p - 0.65) * 3));
   const moonY = (1 - moonEnter) * -40;
   const moonX = (1 - moonEnter) * 40;
-  const activeEvent = events.find((evt) => evt.id === activeTick);
-
   return (
     <div className="tl" onWheel={handleWheel}>
       {/* Backgrounds */}
@@ -371,32 +619,50 @@ This was pure field-born insight. Being in the trenches reveals gaps outsiders n
       {/* Header */}
       <header className="tl-header">
         <span className="tl-header__name">Dominic Martinez</span>
-        <button
-          className="tl-header__case-studies"
-          type="button"
-          onClick={() => openEvent('avarri')}
-        >
-          Case Studies
-        </button>
-      </header>
-
-      <nav className="tl-fast-track" ref={fastTrackRef} aria-label="Fast track timeline navigation">
-        <span className="tl-fast-track__label">Fast Track</span>
-        <div className="tl-fast-track__items">
-          {events.map((evt) => (
+        <nav className="tl-fast-track" aria-label="Fast track timeline navigation">
+          <div className="tl-fast-track__items">
+            {events.map((evt) => (
+              <button
+                key={evt.id}
+                className={`tl-fast-track__item ${activeTick === evt.id ? 'active' : ''}`}
+                type="button"
+                onClick={() => openEvent(evt.id)}
+                aria-label={`Go to ${evt.title}`}
+                aria-current={activeTick === evt.id ? 'true' : undefined}
+              >
+                {evt.title}
+              </button>
+            ))}
+          </div>
+        </nav>
+        <div className="tl-header__case-studies-wrap">
+          <button
+            className="tl-header__case-studies"
+            type="button"
+            aria-haspopup="menu"
+          >
+            Case Studies
+          </button>
+          <div className="tl-header__case-studies-menu" role="menu" aria-label="Case studies">
             <button
-              key={evt.id}
-              className={`tl-fast-track__item ${activeTick === evt.id ? 'active' : ''}`}
               type="button"
-              onClick={() => openEvent(evt.id)}
-              aria-label={`Go to ${evt.title}`}
+              className="tl-header__case-studies-item"
+              role="menuitem"
+              onClick={() => openEvent('avarri')}
             >
-              <span className="tl-fast-track__title">{evt.title}</span>
-              <span className="tl-fast-track__description">{evt.description}</span>
+              Avarri
             </button>
-          ))}
+            <button
+              type="button"
+              className="tl-header__case-studies-item"
+              role="menuitem"
+              onClick={() => openEvent('windowconnect')}
+            >
+              Window Connect
+            </button>
+          </div>
         </div>
-      </nav>
+      </header>
 
       {/* Scrollable area */}
       <div className="tl-scroll" ref={scrollRef}>
@@ -434,15 +700,21 @@ This was pure field-born insight. Being in the trenches reveals gaps outsiders n
               {/* BOTTOM: expanded content below the line */}
               <div className="tl-event__bottom">
                 <AnimatePresence>
-                  {activeTick === evt.id && evt.variant !== 'case-study' && (
+                  {activeTick === evt.id && (
                     <motion.div
-                      className={`tl-event__content ${evt.variant === 'story' ? 'tl-event__content--story' : ''}`}
+                      className={[
+                        'tl-event__content',
+                        evt.variant === 'story' ? 'tl-event__content--story' : '',
+                        evt.variant === 'case-study' ? 'tl-event__content--case-study' : '',
+                      ].filter(Boolean).join(' ')}
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
                       transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
                     >
-                      {evt.variant === 'story' ? (
+                      {evt.variant === 'case-study' ? (
+                        <CaseStudyContent event={evt} />
+                      ) : evt.variant === 'story' ? (
                         <section className="tl-story" aria-label="Story summary">
                           <h2 className="tl-story__headline">{evt.headline}</h2>
                           <p className="tl-story__intro">{evt.content}</p>
@@ -484,75 +756,6 @@ This was pure field-born insight. Being in the trenches reveals gaps outsiders n
 
         {/* Continuous timeline line */}
         <div className="tl-line" />
-      </div>
-
-      <AnimatePresence>
-        {activeEvent?.variant === 'case-study' && (
-          <motion.section
-            className="tl-case-study"
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 12 }}
-            transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
-          >
-            {activeEvent.media?.filter((item) => item.placement !== 'inline').map((item) => (
-              <figure className="tl-case-study__figure" key={item.src}>
-                <img
-                  src={`${import.meta.env.BASE_URL}${item.src}`}
-                  alt={item.alt}
-                  className="tl-case-study__image"
-                />
-                <figcaption>{item.caption}</figcaption>
-              </figure>
-            ))}
-            <div className="tl-case-study__copy">
-              {activeEvent.content.split('\n\n').map((para, i) => {
-                const inlineMedia = activeEvent.media?.filter(
-                  (item) => item.placement === 'inline' && item.afterParagraph === i,
-                );
-
-                return (
-                  <div
-                    className={`tl-case-study__entry ${inlineMedia?.length ? 'tl-case-study__entry--with-media' : ''}`}
-                    key={i}
-                  >
-                    <p>{para}</p>
-                    {inlineMedia?.map((item) => (
-                      <figure className="tl-case-study__figure tl-case-study__figure--inline" key={item.src ?? item.caption}>
-                        {item.images ? (
-                          <div className="tl-case-study__image-pair">
-                            {item.images.map((image) => (
-                              <img
-                                key={image.src}
-                                src={`${import.meta.env.BASE_URL}${image.src}`}
-                                alt={image.alt}
-                                className="tl-case-study__image"
-                              />
-                            ))}
-                          </div>
-                        ) : (
-                          <img
-                            src={`${import.meta.env.BASE_URL}${item.src}`}
-                            alt={item.alt}
-                            className="tl-case-study__image"
-                          />
-                        )}
-                        <figcaption>{item.caption}</figcaption>
-                      </figure>
-                    ))}
-                  </div>
-                );
-              })}
-            </div>
-          </motion.section>
-        )}
-      </AnimatePresence>
-
-      {/* Progress */}
-      <div className="tl-progress">
-        <div className="tl-progress__track">
-          <div className="tl-progress__fill" style={{ width: `${scrollProgress * 100}%` }} />
-        </div>
       </div>
 
       {/* Hint */}
