@@ -197,7 +197,7 @@ const WideContent = ({ event }) => {
                 src={`${baseUrl}${item.src}`}
                 controls
                 playsInline
-                preload="metadata"
+                preload="none"
               />
             ) : (
               <img
@@ -283,7 +283,7 @@ In one sentence, Connect XR is the AR-native social layer that helps you discove
       media: [
         {
           type: 'video',
-          src: 'videos/connectxr-concept-demo.mp4',
+          src: 'videos/connectxr-concept-demo-720p.mp4',
           caption: 'Connect XR concept demo — early vision for spatial AR networking overlays in the physical world.',
           placement: 'inline',
           afterParagraph: 0,
