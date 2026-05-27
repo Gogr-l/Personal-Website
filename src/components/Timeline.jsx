@@ -178,6 +178,42 @@ const CaseStudyContent = ({ event }) => {
   );
 };
 
+const WideContent = ({ event }) => {
+  const baseUrl = import.meta.env.BASE_URL;
+
+  return event.content.split('\n\n').map((para, i) => {
+    const inlineMedia = event.media?.filter(
+      (item) => item.placement === 'inline' && item.afterParagraph === i,
+    );
+
+    return (
+      <div className="tl-wide__entry" key={i}>
+        <p>{para}</p>
+        {inlineMedia?.map((item) => (
+          <figure className="tl-wide__figure" key={item.src ?? item.caption}>
+            {item.type === 'video' ? (
+              <video
+                className="tl-wide__video"
+                src={`${baseUrl}${item.src}`}
+                controls
+                playsInline
+                preload="metadata"
+              />
+            ) : (
+              <img
+                src={`${baseUrl}${item.src}`}
+                alt={item.alt ?? ''}
+                className="tl-wide__image"
+              />
+            )}
+            {item.caption ? <figcaption>{item.caption}</figcaption> : null}
+          </figure>
+        ))}
+      </div>
+    );
+  });
+};
+
 const Timeline = () => {
   const scrollRef = useRef(null);
   const eventRefs = useRef({});
@@ -195,7 +231,7 @@ const Timeline = () => {
       description: 'How I spot overlooked opportunities and turn them into practical systems.',
       variant: 'story',
       headline: 'Build The World',
-      content: 'I notice practical problems hiding inside everyday work, then turn them into systems that create leverage. Window cleaning taught me to see field opportunities most people miss; Window Connect, Akulla, ConnectXR, and Avarri are all different versions of that same pattern: spot friction, clarify the need, and build a solution that makes action easier.',
+      content: 'I notice practical problems hiding inside everyday work, then turn them into systems that create leverage. Window cleaning taught me to see field opportunities most people miss; Window Connect, Akulla, Connect XR, and Avarri are all different versions of that same pattern: spot friction, clarify the need, and build a solution that makes action easier.',
       pillars: [
         {
           icon: 'opportunity',
@@ -228,24 +264,47 @@ Word-of-mouth turned into my best (and free) marketing channel as the client lis
     {
       id: 'connectxr',
       year: '2024',
-      title: 'ConnectXR',
-      description: 'A mixed reality experiment for making in-person networking more natural.',
-      content: `Networking IRL is often awkward. ConnectXR imagined fixing that with mixed reality: AR glasses show subtle digital icons above people nearby—shared interests, work history, mutual connections—without a word.
+      title: 'Connect XR',
+      variant: 'wide',
+      description: 'Early MR networking prototype bridging physical presence with digital identity.',
+      content: `I am currently in the early stages of prototyping Connect XR, a theoretical mixed reality networking platform that explores how AR, VR, and AI can transform real-world social environments into interactive digital spaces by bridging physical presence with our complete digital identities.
 
-I dug into Bluetooth proximity, computer vision tracking, Apple Vision Pro limits, and iPhone camera hacks for an early prototype. The core idea was a "digital persona layer" overlaid on real space—like a dynamic, location-based Linktree visible only in AR.
+The core challenge I have been reflecting on is one I encounter regularly in professional and social settings. Real-world networking continues to feel inefficient and awkward. Whether at conferences, university campuses, coworking spaces, startup events, airport lounges, or casual coffee shops, people often struggle to identify relevant connections, hesitate to initiate conversations, miss valuable opportunities, and quickly forget names and shared interests afterward. Meanwhile, our digital identities remain fragmented across LinkedIn, personal websites, portfolios, social profiles, and online communities, existing entirely apart from the physical moments when they could create the greatest impact. Most current XR experiences prioritize entertainment, gaming, or solitary productivity, leaving a significant gap: there is no robust social layer that makes human connection in mixed reality feel natural, contextual, and ambient.
 
-It was more exploration than startup—pushing how future interfaces could make human connection smoother and more intuitive. It shifted how I view tech: not flashy gadgets, but invisible layers enhancing everyday life.`,
+Connect XR represents my conceptual response to this gap. In theory, the platform would function as an AR-native social layer, allowing people wearing XR devices or using a simple phone-based MVP to discover and interact with nearby individuals through subtle spatial digital overlays. As you look at or gesture toward someone in your field of view, their profile would appear anchored in real space around them. You would instantly see contextual information such as their name and professional background, shared interests or mutual connections, links to social profiles, recent projects or achievements, AI-powered compatibility signals, thoughtful conversation starters drawn from genuine common ground, and a frictionless way to connect. The goal is to make networking feel intelligent and effortless rather than forced or transactional. At its heart, Connect XR would act like a spatial Linktree for people, dynamically bringing fragmented digital identities into the physical world precisely when and where they matter most.
+
+Theoretically, the system would operate through an integrated pipeline. It would begin with nearby user detection via Bluetooth Low Energy and peer-to-peer communication. Computer vision, spatial positioning, signal strength analysis, and motion correlation would then associate detected devices with the actual people in view. Clean AR overlays would follow each person as they move, displaying profile previews, interest indicators, and connect buttons that remain anchored in real space. An AI context engine would analyze interests, career paths, social graph overlaps, and shared experiences to surface meaningful signals and smart conversation starters in real time. Instead of simply seeing a name, the experience might reveal that the person nearby is building in climate tech, that you both studied business, or that you follow the same venture capital firms.
+
+At this early prototyping stage, I am focusing development on the Meta Quest because it offers full camera access and broad accessibility. I am actively building a functional demo that will test nearby user detection, reliable person-device matching, dynamic spatial AR overlays on real people, and the full AI-driven contextual experience in actual social settings. This hands-on work will allow me to validate the core concepts, gather real-world feedback, and refine the interaction design before expanding further.
+
+My long-term vision for Connect XR is to establish it as the foundational spatial social network layer across the broader XR ecosystem. Eventually it could run smoothly on a range of devices, including Apple Vision Pro, Meta AR glasses, Android XR hardware, and lightweight everyday smart glasses. In essence, I am working toward a future in which digital identity exists naturally in physical space around every person, making human connection dramatically easier, smarter, and more meaningful.
+
+In one sentence, Connect XR is the AR-native social layer that helps you discover, understand, and instantly connect with the right people around you in the real world. I look forward to sharing the first working Meta Quest prototype soon and would welcome conversations with others exploring spatial computing, social XR, or AI.`,
+      media: [
+        {
+          type: 'video',
+          src: 'videos/connectxr-concept-demo.mp4',
+          caption: 'Connect XR concept demo — early vision for spatial AR networking overlays in the physical world.',
+          placement: 'inline',
+          afterParagraph: 0,
+        },
+      ],
     },
     {
       id: 'akulla',
       year: '2024',
       title: 'Akulla Intelligence',
+      variant: 'case-study',
       description: 'An AI knowledge-base project built around a real operational pain point.',
-      content: `In 2024, I partnered with my college roommate Curtis (Akulla Intelligence) to build an AI tool for McKinley Irvine Law. It started with a relationship and spotting a common pain: years of documents, procedures, and knowledge scattered across folders. Staff knew the info existed but wasted time hunting it.
+      content: `At the end of my sophomore year I was visiting my old roommate Curtis at Gonzaga and we kept circling back to the same idea of starting something together in the fast-moving world of consumer artificial intelligence. Curtis has a rare gift for technical architecture and system design so I knew I wanted him involved from the start. Around the same time I was having parallel conversations with my friend Jack at UW Tacoma who mentioned that his dad Mr. McKinley was exploring AI options for the family law firm. That connection felt too promising to ignore. Jack and I sat down with Mr. McKinley and he challenged us directly on why two students with no prior technical track record should be trusted with work inside his firm. I was failing my CS 101 class at the time so the conversation was tough but it pushed us to get concrete. Later that day we got Curtis on the phone and landed on a focused concept. We would build a chatbot that pulled directly from the firm's employee handbook so staff could ask normal questions in plain language and receive instant accurate answers instead of hunting through folders or static PDFs.
 
-We created a natural-language chatbot on top of their knowledge base—ask like you'd ask a colleague, get instant answers. Curtis led engineering; I identified the opportunity, built trust with the firm's leadership, clarified the problem, and connected the pieces.
+We turned that concept into a formal written proposal dated December 21 2024 which I co-authored with Curtis Carlson and Jack McKinley. The document outlined a clear three-phase approach starting with a proof-of-concept trained solely on the existing employee handbook followed by iteration based on internal feedback and later expansion into additional resources like style guides HR bulletins and curated legal references. It specified a natural-language interface accessible through a web portal and emphasized secure handling of all data. The proposal also laid out hosting options including a secure subdomain on Akula infrastructure integration into the firm's own systems or deployment through a compliant third-party service. Mr. McKinley and his team liked the practicality of the starter project and we moved forward.
 
-The result: faster access, less friction for the team. It proved value in tech isn't just code—it's seeing the need, earning trust, defining the issue sharply, and assembling the right talent.`,
+Once we had the green light Curtis took the lead on the engineering while Jack and I handled quality control relationship management and day-to-day communication with the client. The system we delivered is a retrieval-augmented generation setup hosted on Microsoft Azure. It uses Azure Cognitive Search to index the handbook content and OpenAI models to generate responses grounded in that source material. One of the most important details we documented in the operational guide I helped create is a simple but effective formatting convention for any new documents added later. We insert clear markers like Page 1 Begins and Page 1 Ends directly into the source files so the chatbot can always cite the exact original page when it answers a question. This small step prevents the common problem of broken references after PDFs are converted and it gives the law firm confidence that every answer is traceable.
+
+The interface itself is fully customizable through environment variables so the firm can update titles logos favicons and even toggle features like chat history or share buttons without touching any code. Authentication is handled through Microsoft Entra ID with managed identities to keep access secure while still allowing straightforward internal use. The entire solution lives inside a dedicated Azure resource group that includes the App Service hosting the web application a Key Vault for secrets and the AI project workspace that connects everything together. I was not writing the models or managing the infrastructure but I made sure the technical choices stayed aligned with what the client actually needed and that the final product matched the vision we sold them.
+
+In the end we delivered a working system and sold it to McKinley Irvin Law for several thousand dollars. The result is a practical tool that removes daily friction for the team by giving them on-demand access to policies procedures and guidelines in a conversational format. For me the project was a full-circle entrepreneurial experience that started with late-night conversations in a dorm room moved through a tough client pitch and ended with a profitable exit we built ourselves while still in college. It reinforced that the most valuable work in technology is often not the code itself but the ability to spot a real operational pain point earn trust with the people who live with it every day define the problem clearly and bring the right skills together to solve it. Curtis handled the deep technical architecture. I focused on connecting the opportunity the client and the execution. That connector role is the one I continue to play and this project remains one of the clearest examples of why it matters.`,
     },
     {
       id: 'avarri',
@@ -706,6 +765,7 @@ Overall, Window Connect turns an informal referral behavior into a structured ma
                         'tl-event__content',
                         evt.variant === 'story' ? 'tl-event__content--story' : '',
                         evt.variant === 'case-study' ? 'tl-event__content--case-study' : '',
+                        evt.variant === 'wide' ? 'tl-event__content--wide' : '',
                       ].filter(Boolean).join(' ')}
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -714,6 +774,8 @@ Overall, Window Connect turns an informal referral behavior into a structured ma
                     >
                       {evt.variant === 'case-study' ? (
                         <CaseStudyContent event={evt} />
+                      ) : evt.variant === 'wide' ? (
+                        <WideContent event={evt} />
                       ) : evt.variant === 'story' ? (
                         <section className="tl-story" aria-label="Story summary">
                           <h2 className="tl-story__headline">{evt.headline}</h2>

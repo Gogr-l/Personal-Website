@@ -667,11 +667,62 @@
   text-align: center;
 }
 
-/* Case study writeups — same slide-in panel as other timeline sections */
-.tl-event__content--case-study {
+/* Case study writeups + wide prose (e.g. Connect XR) — same max width as Avarri slide-in */
+.tl-event__content--case-study,
+.tl-event__content--wide {
   width: min(100%, 68rem);
   max-width: 68rem;
   padding: 0 clamp(0.75rem, 2.5vw, 2rem);
+}
+
+.tl-event__content--wide p {
+  text-align: left;
+  font-size: clamp(0.82rem, 1.05vw, 0.95rem);
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.76);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+}
+
+.tl-wide__entry {
+  width: 100%;
+}
+
+.tl-wide__entry + .tl-wide__entry {
+  margin-top: clamp(1rem, 2vw, 1.35rem);
+}
+
+.tl-wide__entry p {
+  margin: 0;
+}
+
+.tl-wide__figure {
+  width: 100%;
+  margin: clamp(1.25rem, 2.5vw, 1.75rem) 0 0;
+  padding: 0;
+}
+
+.tl-wide__video,
+.tl-wide__image {
+  display: block;
+  width: 100%;
+  max-height: min(62vh, 720px);
+  border-radius: 0.65rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.35);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+}
+
+.tl-wide__video {
+  object-fit: contain;
+}
+
+.tl-wide__figure figcaption {
+  margin-top: 0.75rem;
+  font-size: clamp(0.72rem, 0.95vw, 0.82rem);
+  line-height: 1.55;
+  text-align: left;
+  color: rgba(255, 255, 255, 0.52);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
 }
 
 .tl-case-study__layout {
@@ -1093,7 +1144,8 @@
     line-height: 1.55;
   }
 
-  .tl-event__content--case-study {
+  .tl-event__content--case-study,
+  .tl-event__content--wide {
     padding: 0 0.5rem;
   }
 
