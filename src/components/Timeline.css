@@ -490,9 +490,16 @@
   flex-direction: column;
   align-items: center;
   padding-top: 2rem;
+  padding-bottom: calc(clamp(3.5rem, 9vh, 5.5rem) + env(safe-area-inset-bottom, 0px));
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Story layout already breathes; keep a lighter bottom inset */
+.tl-event__bottom:has(.tl-event__content--story) {
+  padding-bottom: calc(clamp(1.25rem, 3vh, 2rem) + env(safe-area-inset-bottom, 0px));
 }
 
 .tl-event__bottom::-webkit-scrollbar { width: 3px; }
@@ -713,6 +720,8 @@
 }
 
 .tl-wide__video {
+  aspect-ratio: 16 / 9;
+  height: auto;
   object-fit: contain;
 }
 
@@ -760,6 +769,23 @@
 .tl-case-study__figure--inline {
   width: 100%;
   margin: 0 auto;
+}
+
+.tl-case-study__figure--video {
+  margin-top: clamp(1.25rem, 2.5vw, 1.75rem);
+}
+
+.tl-case-study__video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  height: auto;
+  max-height: min(62vh, 720px);
+  border-radius: 0.65rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.35);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  object-fit: contain;
 }
 
 .tl-case-study__image-btn {
@@ -1045,6 +1071,10 @@
   .tl-story__pillar {
     padding: 0 0.65rem;
   }
+
+  .tl-event__bottom:not(:has(.tl-event__content--story)) {
+    padding-bottom: calc(clamp(4.25rem, 12vh, 6.25rem) + env(safe-area-inset-bottom, 0px));
+  }
 }
 
 /* ── Moon image element — partial view, top-right corner ── */
@@ -1099,6 +1129,10 @@
 
   .tl-event__title {
     font-size: 1.4rem;
+  }
+
+  .tl-event__bottom:not(:has(.tl-event__content--story)) {
+    padding-bottom: calc(clamp(5rem, 16vh, 7.5rem) + env(safe-area-inset-bottom, 0px));
   }
 
   .tl-event__content {

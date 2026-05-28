@@ -122,12 +122,23 @@ const CaseStudyContent = ({ event }) => {
               className={[
                 'tl-case-study__figure',
                 'tl-case-study__figure--inline',
+                item.type === 'video' ? 'tl-case-study__figure--video' : '',
                 item.layout === 'persona' ? 'tl-case-study__figure--persona' : '',
                 item.wide ? 'tl-case-study__figure--wide' : '',
               ].filter(Boolean).join(' ')}
               key={item.src ?? item.caption}
             >
-              {item.images ? (
+              {item.type === 'video' ? (
+                <video
+                  className="tl-case-study__video"
+                  src={`${baseUrl}${item.src}`}
+                  poster={item.poster ? `${baseUrl}${item.poster}` : undefined}
+                  style={item.aspectRatio ? { aspectRatio: item.aspectRatio } : undefined}
+                  controls
+                  playsInline
+                  preload="metadata"
+                />
+              ) : item.images ? (
                 <div className="tl-case-study__image-pair">
                   {item.images.map((image) => (
                     <CaseStudyImage
@@ -195,9 +206,10 @@ const WideContent = ({ event }) => {
               <video
                 className="tl-wide__video"
                 src={`${baseUrl}${item.src}`}
+                poster={item.poster ? `${baseUrl}${item.poster}` : undefined}
                 controls
                 playsInline
-                preload="none"
+                preload="metadata"
               />
             ) : (
               <img
@@ -283,7 +295,7 @@ In one sentence, Connect XR is the AR-native social layer that helps you discove
       media: [
         {
           type: 'video',
-          src: 'videos/connectxr-concept-demo-720p.mp4',
+          src: 'videos/connectxr-concept-demo.mp4',
           caption: 'Connect XR concept demo — early vision for spatial AR networking overlays in the physical world.',
           placement: 'inline',
           afterParagraph: 0,
@@ -305,6 +317,17 @@ Once we had the green light Curtis took the lead on the engineering while Jack a
 The interface itself is fully customizable through environment variables so the firm can update titles logos favicons and even toggle features like chat history or share buttons without touching any code. Authentication is handled through Microsoft Entra ID with managed identities to keep access secure while still allowing straightforward internal use. The entire solution lives inside a dedicated Azure resource group that includes the App Service hosting the web application a Key Vault for secrets and the AI project workspace that connects everything together. I was not writing the models or managing the infrastructure but I made sure the technical choices stayed aligned with what the client actually needed and that the final product matched the vision we sold them.
 
 In the end we delivered a working system and sold it to McKinley Irvin Law for several thousand dollars. The result is a practical tool that removes daily friction for the team by giving them on-demand access to policies procedures and guidelines in a conversational format. For me the project was a full-circle entrepreneurial experience that started with late-night conversations in a dorm room moved through a tough client pitch and ended with a profitable exit we built ourselves while still in college. It reinforced that the most valuable work in technology is often not the code itself but the ability to spot a real operational pain point earn trust with the people who live with it every day define the problem clearly and bring the right skills together to solve it. Curtis handled the deep technical architecture. I focused on connecting the opportunity the client and the execution. That connector role is the one I continue to play and this project remains one of the clearest examples of why it matters.`,
+      media: [
+        {
+          type: 'video',
+          src: 'videos/mckinley-irvin-demo-720p.mp4',
+          poster: 'videos/mckinley-irvin-demo-poster.jpg',
+          aspectRatio: '960 / 656',
+          caption: 'McKinley Irvin Law chatbot demo — handbook Q&A in the delivered interface.',
+          placement: 'inline',
+          afterParagraph: 0,
+        },
+      ],
     },
     {
       id: 'avarri',
