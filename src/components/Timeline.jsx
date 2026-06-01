@@ -3,6 +3,24 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import './Timeline.css';
 
+const stopMediaEvent = (e) => {
+  e.stopPropagation();
+};
+
+const TimelineVideo = ({ className, src, poster, aspectRatio }) => (
+  <video
+    className={className}
+    src={src}
+    poster={poster}
+    style={aspectRatio ? { aspectRatio } : undefined}
+    controls
+    playsInline
+    preload="metadata"
+    onPointerDown={stopMediaEvent}
+    onClick={stopMediaEvent}
+  />
+);
+
 const CaseStudyImage = ({ src, alt, className, onExpand }) => (
   <button
     type="button"
@@ -100,8 +118,24 @@ const CaseStudyContent = ({ event }) => {
       {heroMedia.length > 0 && (
         <div className="tl-case-study__hero">
           {heroMedia.map((item) => (
-            <figure className="tl-case-study__figure tl-case-study__figure--hero" key={item.src}>
-              {renderImage(item.src, item.alt, 'tl-case-study__image', item.caption)}
+            <figure
+              className={[
+                'tl-case-study__figure',
+                'tl-case-study__figure--hero',
+                item.type === 'video' ? 'tl-case-study__figure--video' : '',
+              ].filter(Boolean).join(' ')}
+              key={item.src ?? item.caption}
+            >
+              {item.type === 'video' ? (
+                <TimelineVideo
+                  className="tl-case-study__video"
+                  src={`${baseUrl}${item.src}`}
+                  poster={item.poster ? `${baseUrl}${item.poster}` : undefined}
+                  aspectRatio={item.aspectRatio}
+                />
+              ) : (
+                renderImage(item.src, item.alt, 'tl-case-study__image', item.caption)
+              )}
               {item.caption ? <figcaption>{item.caption}</figcaption> : null}
             </figure>
           ))}
@@ -129,14 +163,11 @@ const CaseStudyContent = ({ event }) => {
               key={item.src ?? item.caption}
             >
               {item.type === 'video' ? (
-                <video
+                <TimelineVideo
                   className="tl-case-study__video"
                   src={`${baseUrl}${item.src}`}
                   poster={item.poster ? `${baseUrl}${item.poster}` : undefined}
-                  style={item.aspectRatio ? { aspectRatio: item.aspectRatio } : undefined}
-                  controls
-                  playsInline
-                  preload="metadata"
+                  aspectRatio={item.aspectRatio}
                 />
               ) : item.images ? (
                 <div className="tl-case-study__image-pair">
@@ -203,13 +234,11 @@ const WideContent = ({ event }) => {
         {inlineMedia?.map((item) => (
           <figure className="tl-wide__figure" key={item.src ?? item.caption}>
             {item.type === 'video' ? (
-              <video
+              <TimelineVideo
                 className="tl-wide__video"
                 src={`${baseUrl}${item.src}`}
                 poster={item.poster ? `${baseUrl}${item.poster}` : undefined}
-                controls
-                playsInline
-                preload="metadata"
+                aspectRatio={item.aspectRatio}
               />
             ) : (
               <img
@@ -261,6 +290,10 @@ const Timeline = () => {
           text: 'I turn those insights into repeatable frameworks, marketplaces, workflows, and product concepts designed to scale beyond one-off effort.',
         },
       ],
+      contact: {
+        label: 'Contact',
+        email: 'martinezwdominic@gmail.com',
+      },
     },
     {
       id: 'wwl',
@@ -295,7 +328,9 @@ In one sentence, Connect XR is the AR-native social layer that helps you discove
       media: [
         {
           type: 'video',
-          src: 'videos/connectxr-concept-demo.mp4',
+          src: 'videos/connectxr-concept-demo-720p.mp4',
+          poster: 'videos/connectxr-concept-demo-poster.jpg',
+          aspectRatio: '1280 / 720',
           caption: 'Connect XR concept demo — early vision for spatial AR networking overlays in the physical world.',
           placement: 'inline',
           afterParagraph: 0,
@@ -333,31 +368,40 @@ In the end we delivered a working system and sold it to McKinley Irvin Law for s
       id: 'avarri',
       year: '2025',
       title: 'Avarri',
-      description: 'A design-heavy AI virtual staging case study shaped by customer discovery.',
-      content: `I started Avarri as an AI powered virtual staging tool built for real estate agents. The product lets users upload photos of any room or home and quickly generate clean staged versions that make listings look more appealing to buyers.
+      description: 'An AI virtual staging product that evolved from real estate photos into a live Seldens sales workflow.',
+      content: `I started Avarri as an AI powered virtual staging tool for real estate agents. The first version let users upload photos of a room or listing and generate cleaner staged versions that made the space easier for buyers to imagine.
 
-The idea originally started with interior designers. I wanted to build a tool that let designers take a photo of a real room and precisely edit it by adding, replacing, or adjusting furniture, flooring, and decor. The goal was never just to make pretty pictures. I wanted something designers could actually use in their client workflow and present real design concepts to clients.
+The idea originally started with interior designers. I wanted to build a tool that let designers take a real room photo and precisely edit furniture, flooring, materials, and decor. That early concept helped me win 1st place for best pitch at the Milgard 2025 VIBE Business Plan Competition, but customer discovery quickly showed me that designers needed more precision than image models could reliably provide at the time.
 
-Early on I spent months talking directly to interior designers, consignment store owners, and furniture buyers. What stood out right away was how detail oriented they are. They care a lot about scale, lighting, material accuracy, and how everything fits together in a space. They did not want inspirational mood boards. They wanted control and precision. At the time the AI technology was not consistent enough for that level of detail. The outputs often broke spatial rules or looked unrealistic when making specific edits. That gap made me rethink the target market.
+I spent months talking with interior designers, consignment store owners, furniture buyers, and real estate agents. Designers cared deeply about scale, material accuracy, lighting, and exact placement. Real estate agents had a similar visual problem, but their bar was different: they needed listings to look clean, staged, and appealing fast. That pushed Avarri toward a simpler real estate workflow with bulk staging, preset styles, and custom prompt controls.
 
-Real estate agents had a similar visual problem but they did not need the same level of precision. They just needed listings to look clean, staged, and appealing fast. This matched the current strengths of the technology much better. Working with a technical co founder, we shifted focus and built a simple fast web app for virtual staging. I led the business side including customer discovery, product direction, and user interviews while he handled development.
+After stepping away from Avarri for a while, I came back with a more specific problem: what if a Seldens sales rep could walk into a customer's home, pull up real Seldens inventory on a phone, and show that furniture in the actual room during the meeting? That question became Live, a vendor-specific staging workflow built around Seldens' product catalog instead of generic furniture prompts.
 
-We iterated quickly based on real agent feedback. One of the biggest additions was bulk staging. Agents could upload an entire set of listing photos and apply a consistent style across all of them. We also added preset styles and custom prompt options so users could choose between speed and more control. We even explored features for the buyer side, such as letting buyer agents run a quick design quiz so clients could see the home restaged in their own taste. The goal was to create a stronger emotional connection between buyers and the property.
+For Live, I built a catalog sync pipeline that pulls Seldens' public Shopify feed, mirrors product images into Supabase as optimized WebP assets, and upserts thousands of products into the app with every available product angle. That multi-angle reference set matters because the AI can work from real geometry, materials, and proportions instead of guessing from a single hero photo. Removed SKUs are marked unavailable instead of disappearing, and the sync can run on a schedule or be triggered manually.
 
-Along the way I made several important pivots. I originally considered adding a product marketplace where designers could upload items and earn commissions, but I cut that feature because it added too much complexity and pulled focus from the core value. I also narrowed the target audience down to residential real estate agents only. That clarity helped us make sharper product decisions.
+I also rebuilt the browsing experience around how a rep would actually sell. The Live catalog supports search, sorting, product filters, sale and in-stock toggles, and a persistent "My Selection" tray. Reps can browse products, save a working set, drill into details, take or upload a room photo from a phone, and keep the appointment moving without losing context.
 
-Unfortunately we were not able to launch. We faced two main constraints. The AI still struggled with perfect consistency across multiple images and complex edits. Also my co founder took another job which paused development.
+The core feature is Stage in room. A rep selects real Seldens pieces, adds optional notes like "sectional facing the windows" or "keep the existing rug," and generates a staged scene. Under the hood, a planner model reads the room photo and product angles, decides where each piece should go, and chooses the best reference views. A renderer then uses the room, staging plan, and ordered product references to produce a single staged photograph. The results are not perfect yet, but the end-to-end workflow works and gives reps a much more concrete way to discuss design choices with customers.
 
-The biggest lesson from building Avarri is that the best product is not just about what the technology can do. It is about where the technology creates the most value for a specific user right now. Interior designers have the highest needs, but real estate agents were the better product market fit at this stage.
+Live is still early and access is gated while the workflow is validated, but the product now has a real vertical slice: more than 2,500 Seldens products, multi-angle references, mobile capture, staged room generation, editing, downloads, saved results, and project/library flows. The next challenge is consistency: tighter room preservation, more deterministic regenerations, and better iteration on existing staged outputs.
 
-This project taught me how to validate ideas through constant customer conversations. It taught me how to make tough scoping decisions and stay focused on solving one clear problem really well. I learned when to pivot and when to say no to features that sounded good but hurt the core experience. These skills and business practices are what I will carry into every future project.`,
+The biggest lesson from Avarri is that the best product is not just about what the technology can do. It is about pointing the technology at the right sales motion. Live is not just Avarri with a product grid. It is Avarri focused on one vendor, one catalog, one rep workflow, and one moment that matters: helping a customer see Seldens furniture in their own room while the decision is still being made.`,
       variant: 'case-study',
       media: [
+        {
+          type: 'video',
+          src: 'videos/avarri-live-mode.mp4',
+          poster: 'videos/avarri-live-mode-poster.jpg',
+          aspectRatio: '1476 / 1080',
+          caption: 'Avarri live mode prototype. Using Seldens live furniture catalog for virtual staging.',
+          placement: 'hero',
+        },
         {
           src: 'case-studies/avarri-pitch-examples.png',
           alt: 'Avarri pitch deck examples showing virtual staging before and after images',
           caption: 'These are examples from the pitch deck I used in the Milgard 2025 VIBE Business Plan competition. Avarri won 1st place for best pitch.',
-          placement: 'hero',
+          placement: 'inline',
+          afterParagraph: 1,
         },
         {
           src: 'case-studies/avarri-digital-warehouse-mockup.png',
@@ -644,6 +688,7 @@ Overall, Window Connect turns an informal referral behavior into a structured ma
       if (el?.closest?.('.tl-header')) return;
       if (el?.closest?.('.tl-fast-track')) return;
       if (el?.closest?.('.tl-image-lightbox')) return;
+      if (el?.closest?.('video')) return;
       /* Expanded text for the open section — don’t close while reading */
       const activeBody = activeEl?.querySelector('.tl-event__content');
       if (activeBody?.contains(t)) return;
@@ -822,6 +867,17 @@ Overall, Window Connect turns an informal referral behavior into a structured ma
                               </article>
                             ))}
                           </div>
+                          {evt.contact && (
+                            <div className="tl-story__contact">
+                              <span className="tl-story__contact-label">{evt.contact.label}</span>
+                              <a
+                                className="tl-story__contact-email"
+                                href={`mailto:${evt.contact.email}`}
+                              >
+                                {evt.contact.email}
+                              </a>
+                            </div>
+                          )}
                         </section>
                       ) : (
                         evt.content.split('\n\n').map((para, i) => (
