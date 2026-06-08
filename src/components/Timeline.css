@@ -623,6 +623,20 @@
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
 }
 
+.tl-wide__hero {
+  width: 100%;
+  max-width: 690px;
+  margin: 0 auto clamp(1.25rem, 2.5vw, 1.75rem);
+}
+
+.tl-wide__figure--hero {
+  margin: 0;
+}
+
+.tl-wide__figure--hero .tl-wide__video {
+  max-height: min(52vh, 560px);
+}
+
 .tl-wide__entry {
   width: 100%;
   max-width: 690px;

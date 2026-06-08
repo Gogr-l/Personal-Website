@@ -222,8 +222,34 @@ const CaseStudyContent = ({ event }) => {
 
 const WideContent = ({ event }) => {
   const baseUrl = import.meta.env.BASE_URL;
+  const heroMedia = event.media?.filter((item) => item.placement === 'hero') ?? [];
 
-  return event.content.split('\n\n').map((para, i) => {
+  return (
+    <>
+      {heroMedia.length > 0 && (
+        <div className="tl-wide__hero">
+          {heroMedia.map((item) => (
+            <figure className="tl-wide__figure tl-wide__figure--hero" key={item.src ?? item.caption}>
+              {item.type === 'video' ? (
+                <TimelineVideo
+                  className="tl-wide__video"
+                  src={`${baseUrl}${item.src}`}
+                  poster={item.poster ? `${baseUrl}${item.poster}` : undefined}
+                  aspectRatio={item.aspectRatio}
+                />
+              ) : (
+                <img
+                  src={`${baseUrl}${item.src}`}
+                  alt={item.alt ?? ''}
+                  className="tl-wide__image"
+                />
+              )}
+              {item.caption ? <figcaption>{item.caption}</figcaption> : null}
+            </figure>
+          ))}
+        </div>
+      )}
+      {event.content.split('\n\n').map((para, i) => {
     const inlineMedia = event.media?.filter(
       (item) => item.placement === 'inline' && item.afterParagraph === i,
     );
@@ -252,7 +278,9 @@ const WideContent = ({ event }) => {
         ))}
       </div>
     );
-  });
+  })}
+    </>
+  );
 };
 
 const EventPanelContent = ({ event }) => {
@@ -434,8 +462,7 @@ In one sentence, Connect XR is the AR-native social layer that helps you discove
           poster: 'videos/connectxr-concept-demo-poster.jpg',
           aspectRatio: '1280 / 720',
           caption: 'Connect XR concept demo — early vision for spatial AR networking overlays in the physical world.',
-          placement: 'inline',
-          afterParagraph: 0,
+          placement: 'hero',
         },
       ],
     },
