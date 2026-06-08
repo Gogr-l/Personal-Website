@@ -188,7 +188,7 @@ const CaseStudyContent = ({ event }) => {
               ) : (
                 renderImage(item.src, item.alt, 'tl-case-study__image', item.caption)
               )}
-              <figcaption>{item.caption}</figcaption>
+              {item.caption ? <figcaption>{item.caption}</figcaption> : null}
             </figure>
           ));
 
@@ -255,6 +255,63 @@ const WideContent = ({ event }) => {
   });
 };
 
+const EventPanelContent = ({ event }) => {
+  const baseUrl = import.meta.env.BASE_URL;
+
+  if (event.variant === 'case-study') {
+    return <CaseStudyContent event={event} />;
+  }
+
+  if (event.variant === 'wide') {
+    return <WideContent event={event} />;
+  }
+
+  if (event.variant === 'story') {
+    return (
+      <section className="tl-story" aria-label="Story summary">
+        <h2 className="tl-story__headline">{event.headline}</h2>
+        {event.storyImage && (
+          <img
+            className="tl-story__image"
+            src={`${baseUrl}${event.storyImage.src}`}
+            alt={event.storyImage.alt}
+          />
+        )}
+        <div className="tl-story__intro-block">
+          {event.content.split('\n\n').map((para, i) => (
+            <p
+              key={i}
+              className={`tl-story__intro${i === 0 ? ' tl-story__intro--lead' : ''}`}
+            >
+              {para.split('\n').map((line, j, lines) => (
+                <span key={j}>
+                  {line}
+                  {j < lines.length - 1 && <br />}
+                </span>
+              ))}
+            </p>
+          ))}
+        </div>
+        {event.contact && (
+          <div className="tl-story__contact">
+            <span className="tl-story__contact-label">{event.contact.label}</span>
+            <a
+              className="tl-story__contact-email"
+              href={`mailto:${event.contact.email}`}
+            >
+              {event.contact.email}
+            </a>
+          </div>
+        )}
+      </section>
+    );
+  }
+
+  return event.content.split('\n\n').map((para, i) => (
+    <p key={i}>{para}</p>
+  ));
+};
+
 const Timeline = () => {
   const scrollRef = useRef(null);
   const eventRefs = useRef({});
@@ -268,28 +325,23 @@ const Timeline = () => {
     {
       id: 'bio',
       year: '',
-      title: 'Story',
+      title: 'About',
       description: 'How I spot overlooked opportunities and turn them into practical systems.',
       variant: 'story',
       headline: 'Build The World',
-      content: 'I notice practical problems hiding inside everyday work, then turn them into systems that create leverage. Window cleaning taught me to see field opportunities most people miss; Window Connect, Akulla, Connect XR, and Avarri are all different versions of that same pattern: spot friction, clarify the need, and build a solution that makes action easier.',
-      pillars: [
-        {
-          icon: 'opportunity',
-          title: 'Opportunity Finder',
-          text: 'I find value in overlooked details: broken window leads on job sites, scattered law-firm knowledge, awkward in-person networking, and real estate visuals that fail to move buyers.',
-        },
-        {
-          icon: 'action',
-          title: 'Action Oriented',
-          text: 'I validate through real conversations, adapt when the market or technology pushes back, and keep building toward clear, useful outcomes.',
-        },
-        {
-          icon: 'systems',
-          title: 'Systems Builder',
-          text: 'I turn those insights into repeatable frameworks, marketplaces, workflows, and product concepts designed to scale beyond one-off effort.',
-        },
-      ],
+      storyImage: {
+        src: 'images/build-the-world-quest.png',
+        alt: 'Dominic Martinez wearing a VR headset',
+      },
+      content: `Level 99 idea guy. Currently working on business number #4. $100,000+ entrepreneurial revenues. Future visionary and space exploration enthusiast.
+
+It started with the Washington Aerospace Scholars program. NASA's response to America's aerospace talent shortage, it pulled high school juniors into serious air and space training. I ran propulsion as team leader, designing rocket systems at the Museum of Flight. That hands-on engineering mindset never left. I still build and launch homemade rockets, pilot FPV drones, and rapid-prototype wild concepts with Grok Imagine, Tinkercad, and Trellis. I even created a slick Grok commercial to channel that same energy.
+
+At 17 I started Washington Window Warriors with door-knocking and a water-fed pole. It grew into a premium window cleaning, holiday lighting, and roof services business serving upper-tier homes in Tacoma, Gig Harbor, and Lakewood, clearing over $100k in revenue.
+
+That same drive carried into everything else. I shipped a RAG-based AI chatbot at Akula Intelligence for McKinley Irvin Law. Co-founded AVARRI, the AI virtual staging platform that took 1st place for "Best Pitch" at VIBE 2025. Now I'm onto Window Connect, a SaaS platform that turns window cleaners into scouts feeding Pella, glaziers, and storm repair companies high quality leads. It earned 2nd place "Best Business Plan" at VIBE 2026. At the same time I'm prototyping "CXR" on the Meta Quest 3S: a consent-first AR social overlay using phone BLE beacons, person detection, and depth raycasting so nearby opt-in users get floating world-anchored profile cards with bios, interests, and links. It turns awkward stranger moments into natural, interest-aligned conversations.
+
+I'm finishing my BBA in Business Administration with a minor in Innovation & Design at UW Tacoma. Fitness, longevity habits, and PNW life keep the machine sharp.`,
       contact: {
         label: 'Contact',
         email: 'martinezwdominic@gmail.com',
@@ -299,12 +351,62 @@ const Timeline = () => {
       id: 'wwl',
       year: '2020',
       title: 'Window Warriors',
+      url: 'https://wa-cleaning.com',
       description: 'My first operating business and the foundation for how I learned execution.',
-      content: `I started a window cleaning company not because it was flashy, but because it was straightforward and honest. Show up on time, deliver solid work, communicate clearly—and you get paid. Fall short, and you don't. No hiding behind fancy strategies or excuses. The loop was immediate and unforgiving.
+      variant: 'case-study',
+      content: `At 17 I started Washington Window Warriors with door-knocking and a water-fed pole. It grew into a premium window cleaning, holiday lighting, and roof services business serving upper-tier homes in Tacoma, Gig Harbor, and Lakewood, clearing over $100k in revenue. Show up on time, deliver solid work, communicate clearly, and you get paid. Fall short, and you do not. That immediate feedback loop became my crash course in real entrepreneurship.
 
-That business became my crash course in real entrepreneurship. I learned how customers decide when it's their own money. Trust builds through reliability, not ads. Pricing has to work for everyone involved. I mastered scheduling, weekly revenue tracking, and taking payments any way they came—cash, check, app.
+Beyond residential routes, we took on large-format lighting projects that most small operators avoid. The work pushed us into event installs, multi-story commercial buildings, and permanent roofline systems that had to look flawless from the ground and hold up through Pacific Northwest weather.
 
-Word-of-mouth turned into my best (and free) marketing channel as the client list grew. Text follow-ups to past customers filled quiet months. Adding Christmas light installations doubled winter revenue without new customer hunts. The company funded my later ventures, but more than cash, it taught me that business boils down to consistent, high-quality execution over time.`,
+Lakewold Gardens Winter Glow
+
+We handled lighting for Lakewold Gardens' Winter Glow event, one of the South Sound's signature holiday experiences. That meant lighting long garden paths, architectural features, and signature structures so thousands of visitors could walk through a cohesive winter landscape after dark. We outlined brick walkways, wrapped the estate manor, and lit the iconic dome structure at the end of the main path. Warm white accents on the buildings paired with cool blue uplighting in the tree canopy to create the layered glow Winter Glow is known for.
+
+Commercial Permanent Lighting
+
+We have also installed permanent commercial lighting at Harbor Heights in Olympia and Jefferson Flat in Tacoma. Harbor Heights is a large multi-wing residential complex where we outlined entire rooflines with permanent warm-white LED systems so the building reads clean and elevated at night year-round, not just during the holidays.
+
+Jefferson Flat was a different scale of challenge: steep metal roof sections, rooftop railings, and multi-story edges overlooking downtown Tacoma. The installs required harnessed work on sloped surfaces and along high parapet lines with the Tacoma Dome and city skyline in the background. Those jobs taught us how to plan cable runs, coordinate with property management, and execute safely on buildings where there is zero margin for sloppy work.
+
+Word-of-mouth became our best marketing channel as the client list grew. Text follow-ups to past customers filled quiet months. Holiday and permanent lighting doubled winter revenue without new customer hunts. Window Warriors funded later ventures, but more than cash it taught me that business boils down to consistent, high-quality execution over time.`,
+      media: [
+        {
+          images: [
+            {
+              src: 'case-studies/window-warriors-lakewold-path.png',
+              alt: 'Lakewold Gardens Winter Glow brick pathway lined with warm lights leading to a lit dome structure',
+            },
+            {
+              src: 'case-studies/window-warriors-lakewold-manor.png',
+              alt: 'Lakewold Gardens estate manor wrapped in warm white holiday lights with blue-lit evergreens',
+            },
+          ],
+          caption: 'Lakewold Gardens Winter Glow — pathway lighting and estate manor install for the annual event.',
+          placement: 'inline',
+          afterParagraph: 3,
+        },
+        {
+          src: 'case-studies/window-warriors-harbor-heights.png',
+          alt: 'Harbor Heights apartment complex in Olympia at night with permanent warm white roofline lighting',
+          placement: 'inline',
+          wide: true,
+          afterParagraph: 5,
+        },
+        {
+          images: [
+            {
+              src: 'case-studies/window-warriors-jefferson-flat-roof.png',
+              alt: 'Window Warriors installer on a sloped metal roof at Jefferson Flat with the Tacoma Dome in the background',
+            },
+            {
+              src: 'case-studies/window-warriors-jefferson-flat-railing.png',
+              alt: 'Harnessed Window Warriors crew member installing permanent lights along a high-rise rooftop railing at Jefferson Flat in Tacoma',
+            },
+          ],
+          placement: 'inline',
+          afterParagraph: 5,
+        },
+      ],
     },
     {
       id: 'connectxr',
@@ -367,6 +469,7 @@ In the end we delivered a working system and sold it to McKinley Irvin Law for s
       id: 'avarri',
       year: '2025',
       title: 'Avarri',
+      url: 'https://avarri.design',
       description: 'An AI virtual staging product that evolved from real estate photos into a live Seldens sales workflow.',
       content: `I started Avarri as an AI powered virtual staging tool for real estate agents. The first version let users upload photos of a room or listing and generate cleaner staged versions that made the space easier for buyers to imagine.
 
@@ -430,6 +533,7 @@ The biggest lesson from Avarri is that the best product is not just about what t
       id: 'windowconnect',
       year: '2025',
       title: 'Window Connect',
+      url: 'https://www.windowconnect.app',
       description: 'A two-sided referral marketplace connecting window cleaners with repair companies.',
       variant: 'case-study',
       content: `I built Window Connect to solve a simple but expensive gap in the home services market: window cleaners regularly notice damaged windows, rotting frames, fogged seals, and cracked glass, but there is no easy way for them to turn those observations into qualified repair referrals. At the same time, window repair companies need warm, local leads that are more trustworthy than generic ad leads. Window Connect connects those two groups through a referral workflow where cleaners submit damage leads, repair companies receive matched opportunities, and payments are tracked through the platform.
@@ -489,6 +593,13 @@ Finally, a compact "how payouts work" section restates the business rules (inclu
 Overall, Window Connect turns an informal referral behavior into a structured marketplace. Cleaners get a simple mobile-friendly way to monetize observations they already make on the job. Repair companies get warm, local, photo-backed leads with customer contact information and context. Admins get the oversight needed to manage disputes, billing, payouts, and unassigned leads. The result is a system where every lead has a clear path from field observation to company follow-up to payment.`,
       media: [
         {
+          type: 'video',
+          src: 'videos/window-connect-case-study-720p.mp4',
+          poster: 'videos/window-connect-case-study-poster.jpg',
+          caption: 'Window Connect case study overview.',
+          placement: 'hero',
+        },
+        {
           src: 'case-studies/window-connect-persona-supply.png',
           alt: 'Target customer persona for Tyler Brooks, independent window cleaner on the supply side',
           caption: 'Supply-side persona: Tyler Brooks — independent window cleaner who spots damage in the field.',
@@ -541,69 +652,23 @@ Overall, Window Connect turns an informal referral behavior into a structured ma
     },
   ], []);
 
+  const activeEvent = useMemo(
+    () => events.find((evt) => evt.id === activeTick) ?? null,
+    [events, activeTick],
+  );
+
+  useEffect(() => {
+    if (activeTick) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [activeTick]);
+
   const handleScroll = useCallback(() => {
     const el = scrollRef.current;
     if (!el) return;
     const maxScroll = el.scrollWidth - el.clientWidth;
     setScrollProgress(maxScroll > 0 ? el.scrollLeft / maxScroll : 0);
     lastScrollLeftRef.current = el.scrollLeft;
-
-    if (isAutoScrollingRef.current) return;
-
-    const scrollRect = el.getBoundingClientRect();
-    const viewportCenter = scrollRect.left + scrollRect.width / 2;
-    const centeredEvent = events.reduce((closest, evt) => {
-      const eventEl = eventRefs.current[evt.id];
-      if (!eventEl) return closest;
-
-      const eventRect = eventEl.getBoundingClientRect();
-      const eventCenter = eventRect.left + eventRect.width / 2;
-      const distance = Math.abs(eventCenter - viewportCenter);
-
-      if (!closest || distance < closest.distance) {
-        return { id: evt.id, distance, width: eventRect.width, variant: evt.variant };
-      }
-
-      return closest;
-    }, null);
-
-    if (!centeredEvent) return;
-
-    const activationRange = centeredEvent.width / 2;
-    setActiveTick((current) => (
-      centeredEvent.distance <= activationRange && current !== centeredEvent.id
-        ? centeredEvent.id
-        : current
-    ));
-  }, [events]);
-
-  const handleWheel = useCallback((e) => {
-    const scrollEl = scrollRef.current;
-    if (!scrollEl) return;
-
-    const target = e.target instanceof Element ? e.target : null;
-    if (target?.closest('.tl-event__bottom')) return;
-
-    const maxScroll = scrollEl.scrollWidth - scrollEl.clientWidth;
-    if (maxScroll <= 0) return;
-
-    const modeMultiplier = e.deltaMode === 1
-      ? 16
-      : e.deltaMode === 2
-        ? window.innerHeight
-        : 1;
-    const dominantDelta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
-    const nextScrollLeft = Math.max(
-      0,
-      Math.min(maxScroll, scrollEl.scrollLeft + dominantDelta * modeMultiplier),
-    );
-
-    if (nextScrollLeft === scrollEl.scrollLeft) return;
-
-    e.preventDefault();
-    isAutoScrollingRef.current = false;
-    scrollAnimationIdRef.current += 1;
-    scrollEl.scrollLeft = nextScrollLeft;
   }, []);
 
   useEffect(() => {
@@ -656,14 +721,9 @@ Overall, Window Connect turns an informal referral behavior into a structured ma
   }, []);
 
   const openEvent = useCallback((id) => {
-    if (activeTick === id) {
-      setActiveTick(null);
-      return;
-    }
-
     setActiveTick(id);
     window.requestAnimationFrame(() => scrollEventToCenter(id));
-  }, [activeTick, events, scrollEventToCenter]);
+  }, [scrollEventToCenter]);
 
   useEffect(() => {
     const onKey = (e) => {
@@ -674,32 +734,6 @@ Overall, Window Connect turns an informal referral behavior into a structured ma
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, []);
-
-  /* Click outside the open event (background, spacers, etc.) closes it */
-  useEffect(() => {
-    if (!activeTick) return;
-    const onDocClick = (e) => {
-      const activeEl = eventRefs.current[activeTick];
-      const t = e.target;
-      if (!(t instanceof Node)) return;
-      const el = t instanceof Element ? t : t.parentElement;
-
-      if (el?.closest?.('.tl-header')) return;
-      if (el?.closest?.('.tl-fast-track')) return;
-      if (el?.closest?.('.tl-image-lightbox')) return;
-      if (el?.closest?.('video')) return;
-      /* Expanded text for the open section — don’t close while reading */
-      const activeBody = activeEl?.querySelector('.tl-event__content');
-      if (activeBody?.contains(t)) return;
-
-      /* Title buttons — toggle current or switch section */
-      if (el?.closest?.('.tl-event__title')) return;
-
-      setActiveTick(null);
-    };
-    document.addEventListener('click', onDocClick);
-    return () => document.removeEventListener('click', onDocClick);
-  }, [activeTick]);
 
   // Background opacity — 6 stages: ground → trees → sky → atmosphere → space → moon
   const p = scrollProgress;
@@ -715,7 +749,7 @@ Overall, Window Connect turns an informal referral behavior into a structured ma
   const moonY = (1 - moonEnter) * -40;
   const moonX = (1 - moonEnter) * 40;
   return (
-    <div className="tl" onWheel={handleWheel}>
+    <div className="tl">
       {/* Backgrounds */}
       <div className="tl-bg">
         <div className="tl-bg__layer tl-bg__ground"      style={{ opacity: ground }} />
@@ -756,38 +790,12 @@ Overall, Window Connect turns an informal referral behavior into a structured ma
                 aria-label={`Go to ${evt.title}`}
                 aria-current={activeTick === evt.id ? 'true' : undefined}
               >
-                {evt.title}
+                <span className="tl-fast-track__label">{evt.title}</span>
+                <span className="tl-fast-track__description">{evt.description}</span>
               </button>
             ))}
           </div>
         </nav>
-        <div className="tl-header__case-studies-wrap">
-          <button
-            className="tl-header__case-studies"
-            type="button"
-            aria-haspopup="menu"
-          >
-            Case Studies
-          </button>
-          <div className="tl-header__case-studies-menu" role="menu" aria-label="Case studies">
-            <button
-              type="button"
-              className="tl-header__case-studies-item"
-              role="menuitem"
-              onClick={() => openEvent('avarri')}
-            >
-              Avarri
-            </button>
-            <button
-              type="button"
-              className="tl-header__case-studies-item"
-              role="menuitem"
-              onClick={() => openEvent('windowconnect')}
-            >
-              Window Connect
-            </button>
-          </div>
-        </div>
       </header>
 
       {/* Scrollable area */}
@@ -806,12 +814,25 @@ Overall, Window Connect turns an informal referral behavior into a structured ma
             >
               {/* TOP: title & year above the line */}
               <div className="tl-event__top">
-                <button
-                  className={`tl-event__title ${activeTick === evt.id ? 'active' : ''}`}
-                  onClick={() => openEvent(evt.id)}
-                >
-                  {evt.title}
-                </button>
+                {evt.url ? (
+                  <a
+                    href={evt.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`tl-event__title tl-event__title--linked ${activeTick === evt.id ? 'active' : ''}`}
+                    aria-label={`${evt.title} (opens website)`}
+                  >
+                    {evt.title}
+                  </a>
+                ) : (
+                  <button
+                    type="button"
+                    className={`tl-event__title ${activeTick === evt.id ? 'active' : ''}`}
+                    onClick={() => openEvent(evt.id)}
+                  >
+                    {evt.title}
+                  </button>
+                )}
                 {evt.year
                   ? <span className="tl-event__year">{evt.year}</span>
                   : <span className="tl-event__year-placeholder">&nbsp;</span>
@@ -823,70 +844,6 @@ Overall, Window Connect turns an informal referral behavior into a structured ma
                 <span className={`tl-event__dot ${activeTick === evt.id ? 'active' : ''}`} />
               </div>
 
-              {/* BOTTOM: expanded content below the line */}
-              <div className="tl-event__bottom">
-                <AnimatePresence>
-                  {activeTick === evt.id && (
-                    <motion.div
-                      className={[
-                        'tl-event__content',
-                        evt.variant === 'story' ? 'tl-event__content--story' : '',
-                        evt.variant === 'case-study' ? 'tl-event__content--case-study' : '',
-                        evt.variant === 'wide' ? 'tl-event__content--wide' : '',
-                      ].filter(Boolean).join(' ')}
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
-                    >
-                      {evt.variant === 'case-study' ? (
-                        <CaseStudyContent event={evt} />
-                      ) : evt.variant === 'wide' ? (
-                        <WideContent event={evt} />
-                      ) : evt.variant === 'story' ? (
-                        <section className="tl-story" aria-label="Story summary">
-                          <h2 className="tl-story__headline">{evt.headline}</h2>
-                          <p className="tl-story__intro">{evt.content}</p>
-                          <div className="tl-story__pillars">
-                            {evt.pillars.map((pillar) => (
-                              <article className="tl-story__pillar" key={pillar.title}>
-                                <span className={`tl-story__icon tl-story__icon--${pillar.icon}`} aria-hidden="true">
-                                  {pillar.icon === 'action' && (
-                                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                                      <path d="m11 17 2 2a1 1 0 1 0 3-3" />
-                                      <path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4" />
-                                      <path d="m21 3 1 11h-2" />
-                                      <path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3" />
-                                      <path d="M3 4h8" />
-                                    </svg>
-                                  )}
-                                </span>
-                                <h3>{pillar.title}</h3>
-                                <p>{pillar.text}</p>
-                              </article>
-                            ))}
-                          </div>
-                          {evt.contact && (
-                            <div className="tl-story__contact">
-                              <span className="tl-story__contact-label">{evt.contact.label}</span>
-                              <a
-                                className="tl-story__contact-email"
-                                href={`mailto:${evt.contact.email}`}
-                              >
-                                {evt.contact.email}
-                              </a>
-                            </div>
-                          )}
-                        </section>
-                      ) : (
-                        evt.content.split('\n\n').map((para, i) => (
-                          <p key={i}>{para}</p>
-                        ))
-                      )}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
             </div>
           ))}
 
@@ -898,15 +855,27 @@ Overall, Window Connect turns an informal referral behavior into a structured ma
         <div className="tl-line" />
       </div>
 
-      {/* Hint */}
-      <motion.div
-        className="tl-hint"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.5 }}
-      >
-        Scroll →
-      </motion.div>
+      <div className="tl-content-viewport">
+        <AnimatePresence mode="wait">
+          {activeEvent && (
+            <motion.div
+              key={activeEvent.id}
+              className={[
+                'tl-event__content',
+                activeEvent.variant === 'story' ? 'tl-event__content--story' : '',
+                activeEvent.variant === 'case-study' ? 'tl-event__content--case-study' : '',
+                activeEvent.variant === 'wide' ? 'tl-event__content--wide' : '',
+              ].filter(Boolean).join(' ')}
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+            >
+              <EventPanelContent event={activeEvent} />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 };
