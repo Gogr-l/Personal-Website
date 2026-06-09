@@ -438,36 +438,6 @@ Word-of-mouth became our best marketing channel as the client list grew. Text fo
       ],
     },
     {
-      id: 'connectxr',
-      year: '2024',
-      title: 'Connect XR',
-      variant: 'wide',
-      description: 'Early MR networking prototype bridging physical presence with digital identity.',
-      content: `I am currently in the early stages of prototyping Connect XR, a theoretical mixed reality networking platform that explores how AR, VR, and AI can transform real-world social environments into interactive digital spaces by bridging physical presence with our complete digital identities.
-
-The core challenge I have been reflecting on is one I encounter regularly in professional and social settings. Real-world networking continues to feel inefficient and awkward. Whether at conferences, university campuses, coworking spaces, startup events, airport lounges, or casual coffee shops, people often struggle to identify relevant connections, hesitate to initiate conversations, miss valuable opportunities, and quickly forget names and shared interests afterward. Meanwhile, our digital identities remain fragmented across LinkedIn, personal websites, portfolios, social profiles, and online communities, existing entirely apart from the physical moments when they could create the greatest impact. Most current XR experiences prioritize entertainment, gaming, or solitary productivity, leaving a significant gap: there is no robust social layer that makes human connection in mixed reality feel natural, contextual, and ambient.
-
-Connect XR represents my conceptual response to this gap. In theory, the platform would function as an AR-native social layer, allowing people wearing XR devices or using a simple phone-based MVP to discover and interact with nearby individuals through subtle spatial digital overlays. As you look at or gesture toward someone in your field of view, their profile would appear anchored in real space around them. You would instantly see contextual information such as their name and professional background, shared interests or mutual connections, links to social profiles, recent projects or achievements, AI-powered compatibility signals, thoughtful conversation starters drawn from genuine common ground, and a frictionless way to connect. The goal is to make networking feel intelligent and effortless rather than forced or transactional. At its heart, Connect XR would act like a spatial Linktree for people, dynamically bringing fragmented digital identities into the physical world precisely when and where they matter most.
-
-Theoretically, the system would operate through an integrated pipeline. It would begin with nearby user detection via Bluetooth Low Energy and peer-to-peer communication. Computer vision, spatial positioning, signal strength analysis, and motion correlation would then associate detected devices with the actual people in view. Clean AR overlays would follow each person as they move, displaying profile previews, interest indicators, and connect buttons that remain anchored in real space. An AI context engine would analyze interests, career paths, social graph overlaps, and shared experiences to surface meaningful signals and smart conversation starters in real time. Instead of simply seeing a name, the experience might reveal that the person nearby is building in climate tech, that you both studied business, or that you follow the same venture capital firms.
-
-At this early prototyping stage, I am focusing development on the Meta Quest because it offers full camera access and broad accessibility. I am actively building a functional demo that will test nearby user detection, reliable person-device matching, dynamic spatial AR overlays on real people, and the full AI-driven contextual experience in actual social settings. This hands-on work will allow me to validate the core concepts, gather real-world feedback, and refine the interaction design before expanding further.
-
-My long-term vision for Connect XR is to establish it as the foundational spatial social network layer across the broader XR ecosystem. Eventually it could run smoothly on a range of devices, including Apple Vision Pro, Meta AR glasses, Android XR hardware, and lightweight everyday smart glasses. In essence, I am working toward a future in which digital identity exists naturally in physical space around every person, making human connection dramatically easier, smarter, and more meaningful.
-
-In one sentence, Connect XR is the AR-native social layer that helps you discover, understand, and instantly connect with the right people around you in the real world. I look forward to sharing the first working Meta Quest prototype soon and would welcome conversations with others exploring spatial computing, social XR, or AI.`,
-      media: [
-        {
-          type: 'video',
-          src: 'videos/connectxr-concept-demo-720p.mp4',
-          poster: 'videos/connectxr-concept-demo-poster.jpg',
-          aspectRatio: '1280 / 720',
-          caption: 'Connect XR concept demo — early vision for spatial AR networking overlays in the physical world.',
-          placement: 'hero',
-        },
-      ],
-    },
-    {
       id: 'akulla',
       year: '2024',
       title: 'Akulla Intelligence',
@@ -675,6 +645,36 @@ Overall, Window Connect turns an informal referral behavior into a structured ma
           placement: 'inline',
           layout: 'stack',
           afterParagraph: 23,
+        },
+      ],
+    },
+    {
+      id: 'connectxr',
+      year: '2026',
+      title: 'Connect XR',
+      variant: 'wide',
+      description: 'Early MR networking prototype bridging physical presence with digital identity.',
+      content: `I am currently in the early stages of prototyping Connect XR, a theoretical mixed reality networking platform that explores how AR, VR, and AI can transform real-world social environments into interactive digital spaces by bridging physical presence with our complete digital identities.
+
+The core challenge I have been reflecting on is one I encounter regularly in professional and social settings. Real-world networking continues to feel inefficient and awkward. Whether at conferences, university campuses, coworking spaces, startup events, airport lounges, or casual coffee shops, people often struggle to identify relevant connections, hesitate to initiate conversations, miss valuable opportunities, and quickly forget names and shared interests afterward. Meanwhile, our digital identities remain fragmented across LinkedIn, personal websites, portfolios, social profiles, and online communities, existing entirely apart from the physical moments when they could create the greatest impact. Most current XR experiences prioritize entertainment, gaming, or solitary productivity, leaving a significant gap: there is no robust social layer that makes human connection in mixed reality feel natural, contextual, and ambient.
+
+Connect XR represents my conceptual response to this gap. In theory, the platform would function as an AR-native social layer, allowing people wearing XR devices or using a simple phone-based MVP to discover and interact with nearby individuals through subtle spatial digital overlays. As you look at or gesture toward someone in your field of view, their profile would appear anchored in real space around them. You would instantly see contextual information such as their name and professional background, shared interests or mutual connections, links to social profiles, recent projects or achievements, AI-powered compatibility signals, thoughtful conversation starters drawn from genuine common ground, and a frictionless way to connect. The goal is to make networking feel intelligent and effortless rather than forced or transactional. At its heart, Connect XR would act like a spatial Linktree for people, dynamically bringing fragmented digital identities into the physical world precisely when and where they matter most.
+
+Theoretically, the system would operate through an integrated pipeline. It would begin with nearby user detection via Bluetooth Low Energy and peer-to-peer communication. Computer vision, spatial positioning, signal strength analysis, and motion correlation would then associate detected devices with the actual people in view. Clean AR overlays would follow each person as they move, displaying profile previews, interest indicators, and connect buttons that remain anchored in real space. An AI context engine would analyze interests, career paths, social graph overlaps, and shared experiences to surface meaningful signals and smart conversation starters in real time. Instead of simply seeing a name, the experience might reveal that the person nearby is building in climate tech, that you both studied business, or that you follow the same venture capital firms.
+
+At this early prototyping stage, I am focusing development on the Meta Quest because it offers full camera access and broad accessibility. I am actively building a functional demo that will test nearby user detection, reliable person-device matching, dynamic spatial AR overlays on real people, and the full AI-driven contextual experience in actual social settings. This hands-on work will allow me to validate the core concepts, gather real-world feedback, and refine the interaction design before expanding further.
+
+My long-term vision for Connect XR is to establish it as the foundational spatial social network layer across the broader XR ecosystem. Eventually it could run smoothly on a range of devices, including Apple Vision Pro, Meta AR glasses, Android XR hardware, and lightweight everyday smart glasses. In essence, I am working toward a future in which digital identity exists naturally in physical space around every person, making human connection dramatically easier, smarter, and more meaningful.
+
+In one sentence, Connect XR is the AR-native social layer that helps you discover, understand, and instantly connect with the right people around you in the real world. I look forward to sharing the first working Meta Quest prototype soon and would welcome conversations with others exploring spatial computing, social XR, or AI.`,
+      media: [
+        {
+          type: 'video',
+          src: 'videos/connectxr-concept-demo-720p.mp4',
+          poster: 'videos/connectxr-concept-demo-poster.jpg',
+          aspectRatio: '1280 / 720',
+          caption: 'Connect XR concept demo — early vision for spatial AR networking overlays in the physical world.',
+          placement: 'hero',
         },
       ],
     },
