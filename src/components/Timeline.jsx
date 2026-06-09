@@ -343,6 +343,7 @@ const EventPanelContent = ({ event }) => {
 const Timeline = () => {
   const scrollRef = useRef(null);
   const eventRefs = useRef({});
+  const fastTrackItemRefs = useRef({});
   const lastScrollLeftRef = useRef(0);
   const isAutoScrollingRef = useRef(false);
   const scrollAnimationIdRef = useRef(0);
@@ -684,11 +685,25 @@ Overall, Window Connect turns an informal referral behavior into a structured ma
     [events, activeTick],
   );
 
+  const scrollFastTrackToCenter = useCallback((id) => {
+    if (!window.matchMedia('(max-width: 900px)').matches) return;
+
+    const item = fastTrackItemRefs.current[id];
+    if (!item) return;
+
+    item.scrollIntoView({
+      behavior: 'smooth',
+      inline: 'center',
+      block: 'nearest',
+    });
+  }, []);
+
   useEffect(() => {
-    if (activeTick) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  }, [activeTick]);
+    if (!activeTick) return;
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.requestAnimationFrame(() => scrollFastTrackToCenter(activeTick));
+  }, [activeTick, scrollFastTrackToCenter]);
 
   const handleScroll = useCallback(() => {
     const el = scrollRef.current;
@@ -811,6 +826,10 @@ Overall, Window Connect turns an informal referral behavior into a structured ma
             {events.map((evt) => (
               <button
                 key={evt.id}
+                ref={(node) => {
+                  if (node) fastTrackItemRefs.current[evt.id] = node;
+                  else delete fastTrackItemRefs.current[evt.id];
+                }}
                 className={`tl-fast-track__item ${activeTick === evt.id ? 'active' : ''}`}
                 type="button"
                 onClick={() => openEvent(evt.id)}
@@ -842,15 +861,24 @@ Overall, Window Connect turns an informal referral behavior into a structured ma
               {/* TOP: title & year above the line */}
               <div className="tl-event__top">
                 {evt.url ? (
-                  <a
-                    href={evt.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`tl-event__title tl-event__title--linked ${activeTick === evt.id ? 'active' : ''}`}
-                    aria-label={`${evt.title} (opens website)`}
-                  >
-                    {evt.title}
-                  </a>
+                  <span className="tl-event__title-group">
+                    <button
+                      type="button"
+                      className={`tl-event__title tl-event__title--linked ${activeTick === evt.id ? 'active' : ''}`}
+                      onClick={() => openEvent(evt.id)}
+                    >
+                      {evt.title}
+                    </button>
+                    <a
+                      className="tl-event__title-external"
+                      href={evt.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`${evt.title} (opens website)`}
+                    >
+                      ↗
+                    </a>
+                  </span>
                 ) : (
                   <button
                     type="button"
